@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+
+        .blueBulbOff {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #000066; /* off state */
+            box-shadow: 0 0 5px #000033; /* subtle dark glow */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .blueBulbOn {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: blue; /* bright blue for "on" */
+            box-shadow: 0 0 20px blue; /* glowing effect */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .redBulbOff {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #660000; /* off state */
+            box-shadow: 0 0 5px #330000; /* subtle dark glow */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .redBulbOn {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: red; /* bright red for "on" */
+            box-shadow: 0 0 20px red; /* glowing effect */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .wrapper {
+            display: flex;
+            align-items: center; /* vertically align */
+            gap: 0px; /* space between label & table */
+        }
+        .group1 {
+            transform: rotate(-90deg);
+            display: inline-block; /* allow rotation properly */
+            text-align: center; /* center letters inside td */
+            font-family: Verdana, sans-serif;
+            font-size: 30px;
+            white-space: nowrap; /* prevent line wrap */
+            color: red;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            gap: 10px; /* space between divs */
+            font-size: 20px;
+            font-family: Verdana, sans-serif;
+            text-align: center;
+            background-color: burlywood;
+            padding: 20px;
+        }
+
+        .box {
+            flex: 1; /* make all equal width */
+            background: burlywood;
+            text-align: right;
+        }
+        .group2 {
+            display: flex;
+            justify-content: center; /* center horizontally */
+            align-items: center; /* center vertically */
+            font-family: Verdana, sans-serif;
+            font-size: 30px;
+            color: blue;
+            padding: 10px;
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 0 auto;
+            background: lightblue;
+            width: 700px;
+            height: 70px;
+        }
+
+        /* The slider itself */
+        .slider {
+            width: 100%;
+            height: 25px;
+            pointer-events: none; /* prevent user dragging */
+        }
+
+        /* Zero marker */
+        .marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 30px;
+            background: black;;
+        }
+
+        /* -1 marker */
+        .left-marker {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 30px;
+            background: black;
+            font: bold;
+        }
+
+        /* +1 marker */
+        .right-marker {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 30px;
+            background: black;
+            font: bold;
+        }
+
+        /* Floating value label */
+        .value-label {
+            position: absolute;
+            top: 40px;
+            background: lightblue;
+            color: black;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        /* Labels */
+        .label {
+            position: absolute;
+            top: 55%;
+            margin-top: 5px;
+            font-size: 24px;
+            color: black;
+        }
+
+        .label-left {
+            left: 0;
+            transform: translateX(-100%);
+            color: black;
+        }
+
+        .label-center {
+            left: 50%;
+            transform: translateX(0%);
+            color: red;
+        }
+
+        .label-right {
+            right: 0;
+            transform: translateX(50%);
+            color: black;
+        }
+        p {
+            padding: 6px ;
+            font-size: 20px;
+            color: white;
+            display: block;
+        }
+
+        table {
+            border: none;
+            border-collapse: collapse; /* must be on table, not td */
+            width: 100%; /* outer table full width */
+        }
+
+
+        td {
+            border: none; /* width + style + color 1px solid black*/
+            height: 20px;
+            padding: 0px;
+            background-color: white;
+            font-family: Verdana, sans-serif;
+            font-size: 15px;
+            width: 20px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .button {
+            background-color:  lightgray;
+            border: solid;
+            border-color: black;
+            color: black;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-table;
+            font-family: Verdana, sans-serif;
+            font-size: 20px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .plusminusbutton {
+            width: 100%;
+            height: 100%;
+            display: block; /* ensures it expands */
+            box-sizing: border-box; /* ensures padding/border stay inside */
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: lightyellow;
+            color: cornflowerblue;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-family: Verdana, sans-serif;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+    </style>
+    <script>
+
+        function siteLoading() {
+            createCliffsTable("cliffsTable");
+            populateHorizontalNumbers();
+            populateVerticalalNumbers();
+
+            delta = 0;
+            slider = document.getElementById("cliffSlider");
+            valueLabel = document.getElementById("valueLabel");
+            valueLabel.textContent = "d: " + delta;
+
+            // Position label above slider thumb
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(delta);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            valueLabel.style.left = thumbX + "px";
+
+
+
+            
+        }
+
+        function populateHorizontalNumbers() {
+        }
+
+        function populateVerticalalNumbers() {
+        }
+
+        function addOne(buttonID) {
+            console.log("Button clicked is: " + buttonID);
+            const locations = buttonID.split("-");
+            let rowString = locations[0];
+            let colString = locations[1];
+            let row = parseInt(rowString);
+            let col = parseInt(colString);
+
+            if (row >=  4) {
+                col = col + 1;
+                console.log("Trying to get the values of " + (row.toString() + "-" + col.toString()));
+
+                let cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                cellValueInt = parseInt(cellValue);
+                cellValueInt = cellValueInt + 1;
+
+                document.getElementById(row + "-" + (col)).innerText = cellValueInt.toString();
+            }
+            else {
+                row = row + 1;
+                console.log("Trying to get the values of " + (row.toString() + "-" + col.toString()));
+
+                let cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                cellValueInt = parseInt(cellValue);
+                cellValueInt = cellValueInt + 1;
+
+                document.getElementById(row + "-" + (col)).innerText = cellValueInt.toString();
+            }
+
+            calculateDominanceMatrix(); 
+        }
+
+        function minusOne(buttonID) {
+            console.log("Button clicked is: " + buttonID);
+            const locations = buttonID.split("-");
+            let rowString = locations[0];
+            let colString = locations[1];
+            let row = parseInt(rowString);
+            let col = parseInt(colString);
+
+            if (row >= 4) {
+                col = col - 1;
+                console.log("Trying to get the values of " + (row.toString() + "-" + col.toString()));
+
+                let cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                cellValueInt = parseInt(cellValue);
+                cellValueInt = cellValueInt - 1;
+
+                document.getElementById(row + "-" + (col)).innerText = cellValueInt.toString();
+            }
+            else {
+                row = row - 1;
+                console.log("Trying to get the values of " + (row.toString() + "-" + col.toString()));
+
+                let cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                cellValueInt = parseInt(cellValue);
+                cellValueInt = cellValueInt - 1;
+
+                document.getElementById(row + "-" + (col)).innerText = cellValueInt.toString();
+            }
+
+            calculateDominanceMatrix(); 
+        }
+
+        function hoverOn(cellID) {
+            const locations = cellID.split("-");
+            let rowString = locations[0];
+            let colString = locations[1];
+            let row = parseInt(rowString);
+            let col = parseInt(colString);
+
+            if (row <= 3 || col <= 3 || (row > 23 && col < 4) || (col > 23 && row < 4)) {
+                return;
+            }
+
+            document.getElementById(cellID).style.borderColor = "red";
+           
+
+            if (row == 24 && col >= 4 && col < 24) {
+                //from the horizontal row downwards. Row is always 1
+                for (i = 4; i <= row; i++) {
+                    document.getElementById(i.toString() + "-" + colString).style.borderColor = "red";
+                    document.getElementById(i.toString() + "-" + colString).style.borderWidth = "2px";
+                    document.getElementById(i.toString() + "-" + colString).style.backgroundColor = "#FCF55F";
+                }
+            }
+            else if (col == 24 && row >= 4 && row < 24) {
+                //from the vertical column going right. Col is always 1
+                for (i = 4; i <= col; i++) {
+                    document.getElementById(rowString + "-" + i.toString()).style.borderColor = "red";
+                    document.getElementById(rowString + "-" + i.toString()).style.borderWidth = "2px";
+                    document.getElementById(rowString + "-" + i.toString()).style.backgroundColor = "#FCF55F";
+                }
+            }
+            else if (row == 24 && col == 24) {
+                for (i = 4; i <= row; i++) {
+                    document.getElementById(i.toString() + "-" + colString).style.borderColor = "red";
+                    document.getElementById(i.toString() + "-" + colString).style.borderWidth = "2px";
+                    document.getElementById(i.toString() + "-" + colString).style.backgroundColor = "#FCF55F";
+                }
+
+                //from the vertical column going right. Col is always 1
+                for (i = 4; i <= col; i++) {
+                    document.getElementById(rowString + "-" + i.toString()).style.borderColor = "red";
+                    document.getElementById(rowString + "-" + i.toString()).style.borderWidth = "2px";
+                    document.getElementById(rowString + "-" + i.toString()).style.backgroundColor = "#FCF55F";
+                }
+            }
+            else {
+                //from the horizontal row downwards. Row is always 1
+                for (i = 1; i <= row; i++) {
+                    document.getElementById(i.toString() + "-" + colString).style.borderColor = "red";
+                    document.getElementById(i.toString() + "-" + colString).style.borderWidth = "2px";
+                    document.getElementById(i.toString() + "-" + colString).style.backgroundColor = "#FCF55F";
+                }
+
+                //from the vertical column going right. Col is always 1
+                for (i = 1; i <= col; i++) {
+                    document.getElementById(rowString + "-" + i.toString()).style.borderColor = "red";
+                    document.getElementById(rowString + "-" + i.toString()).style.borderWidth = "2px";
+                    document.getElementById(rowString + "-" + i.toString()).style.backgroundColor = "#FCF55F";
+                }
+            }
+
+            
+
+            
+
+        }
+
+        function hoverOff(cellID) {
+            
+            const locations = cellID.split("-");
+            let rowString = locations[0];
+            let colString = locations[1];
+            let row = parseInt(rowString);
+            let col = parseInt(colString);
+
+            document.getElementById(cellID).style.borderColor = "black";
+            document.getElementById(cellID).style.borderBlockWidth = "1px";
+            
+            for (i = 1; i <= row; i++) {
+                document.getElementById(i.toString() + "-" + colString).style.borderColor = "black";
+                document.getElementById(i.toString() + "-" + colString).style.borderWidth = "1px";
+                document.getElementById(i.toString() + "-" + colString).style.backgroundColor = "white";
+            }
+
+            //from the vertical column going right. Col is always 1
+            for (i = 1; i <= col; i++) {
+                document.getElementById(rowString + "-" + i.toString()).style.borderColor = "black";
+                document.getElementById(rowString + "-" + i.toString()).style.borderWidth = "1px";
+                document.getElementById(rowString + "-" + i.toString()).style.backgroundColor = "white";
+            }
+
+            for (let row = 4; row < 24; row++) {
+                let col = 1
+                document.getElementById(row + "-" + col).style.backgroundColor = "pink";
+            }
+
+            //resetting the horizontal column
+            for (let col = 4; col < 24; col++) {
+                let row = 1
+                document.getElementById(row + "-" + col).style.backgroundColor = "cyan";
+            }
+
+            for (let row = 4; row < 24; row++) {
+                for (let col = 4; col < 24; col++) {
+                    cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                    if (cellValue == 1) {
+                        document.getElementById(row.toString() + "-" + col.toString()).style.backgroundColor = "cyan";
+                    }
+                    else if (cellValue == -1) {
+                        document.getElementById(row.toString() + "-" + col.toString()).style.backgroundColor = "pink";
+                    }
+                }
+            }
+
+            for (let row = 4; row < 24; row++) {
+                let col = 24;
+                document.getElementById(row + "-" + col).style.backgroundColor = "LightGreen";
+            }
+
+            for (let col = 4; col < 24; col++) {
+                let row = 24;
+                document.getElementById(row + "-" + col).style.backgroundColor = "LemonChiffon";
+            }
+
+            document.getElementById("24-24").style.backgroundColor = "gold";
+        }
+
+        function createCliffsTable(tableID) {
+            // Get a reference to the table
+            let tableRef = document.getElementById(tableID);
+
+            for (let row = 0; row < 25; row++) {
+                // Insert a row at the end of the table
+                let newRow = tableRef.insertRow(-1);
+                // Insert a cell in the row at index 0
+                for (let col = 24; col >= 0; col--) {
+                    let newCell = newRow.insertCell(0);
+                    // Append a text node to the cell
+                    newCell.setAttribute('id', row + "-" + col);
+                    newCell.setAttribute('onclick', "cellClicked(this.id)");
+                    newCell.setAttribute('onmouseenter', "hoverOn(this.id)");
+                    newCell.setAttribute('onmouseleave', "hoverOff(this.id)");
+
+                    if (((col == 0 && row >= 4) || (row == 0 && col >= 4)) && (col != 24) && (row != 24)) {
+                        // Create button
+                        const btn = document.createElement("button");
+                        btn.setAttribute('class', 'plusminusbutton');
+                        btn.textContent = "+";
+                        btn.addEventListener("click", () => {
+                            addOne(row + "-" + col);
+                        });
+                        newCell.appendChild(btn);
+                    }
+
+                    else if (((col == 2 && row >= 4) || (row == 2 && col >= 4)) && (col != 24) && (row !=24))  {
+                        // Create button
+                        const btn = document.createElement("button");
+                        btn.textContent = "-";
+                        btn.setAttribute('class', 'plusminusbutton');
+                        btn.addEventListener("click", () => {
+                            minusOne(row + "-" + col);
+                        });
+                        newCell.appendChild(btn);
+                    }
+                    else {
+                        let newText = document.createTextNode("");
+                        newCell.appendChild(newText);
+                    }
+                    
+                }
+            }
+
+            
+            resetValues();
+            clearCliffsTable();
+            calculateDominanceMatrix()
+        }
+
+        function clearCliffsTable() {
+            for (let row = 4; row < 24; row++) {
+                for (let col = 4; col < 24; col++) {
+                    document.getElementById(row + "-" + col).style.border = "1px solid black";
+                    document.getElementById(row + "-" + col).style.backgroundColor = "white";
+                    document.getElementById(row + "-" + col).innerText = "";
+                }
+            }
+        }
+
+        function resetValues() {
+            //resetting the vertical column
+            for (let row = 4; row < 24; row++) {
+                let col = 1
+                document.getElementById(row + "-" + col).style.backgroundColor = "pink";
+                document.getElementById(row + "-" + col).innerText = 0;
+                document.getElementById(row + "-" + col).setAttribute("contenteditable", "true");
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                cell = document.getElementById(row + "-" + col);
+                cell.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault(); // prevent new line
+                        calculateDominanceMatrix();
+                        cell.blur();
+                    }
+                });
+
+                cell.addEventListener("blur", () => {
+                    calculateDominanceMatrix();
+                });
+            }
+
+            for (let row = 4; row < 24; row++) {
+                let col = 24;
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                document.getElementById(row + "-" + col).style.backgroundColor = "LightGreen";
+                document.getElementById(row + "-" + col).innerText = 0;
+            }
+
+            //resetting the horizontal column
+            for (let col = 4; col < 24; col++) {
+                let row = 1
+                document.getElementById(row + "-" + col).style.backgroundColor = "cyan";
+                document.getElementById(row + "-" + col).innerText = 0;
+                document.getElementById(row + "-" + col).setAttribute("contenteditable", "true");
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                cell = document.getElementById(row + "-" + col);
+                cell.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault(); // prevent new line
+                        calculateDominanceMatrix();
+                        cell.blur();
+                    }
+                });
+
+                cell.addEventListener("blur", () => {
+                    calculateDominanceMatrix();
+                });
+            }
+
+            for (let col = 4; col < 24; col++) {
+                let row = 24;
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                document.getElementById(row + "-" + col).style.backgroundColor = "LemonChiffon";
+                document.getElementById(row + "-" + col).innerText = 0;
+            }
+
+            document.getElementById("valueLabel").style.fontSize = "16px";
+            document.getElementById("variancePlusSlider").style.color = "red"
+            document.getElementById("variancePlusSlider").style.fontSize = "20px";
+            document.getElementById("varianceMinusSlider").style.color = "blue"
+            document.getElementById("varianceMinusSlider").style.fontSize = "20px";
+        }
+
+        function cellClicked(cellID) {
+            console.log(cellID);
+
+            if (cellID == "cliffsDelta"|| cellID == "+" || cellID == "-") {
+                if (cellID == "cliffsDelta") {
+                    document.getElementById("deltaLabel").style.backgroundColor = "yellow";
+                    document.getElementById("delta").style.backgroundColor = "yellow";
+                    // reset after 2 seconds (2000 ms)
+                    setTimeout(() => {
+                        document.getElementById("deltaLabel").style.backgroundColor = "burlywood";
+                        document.getElementById("delta").style.backgroundColor = "burlywood";
+                    }, 2000);
+                }
+                else if (cellID == "+") {
+                    document.getElementById("varianceMax").style.backgroundColor = "yellow";
+                    document.getElementById("varianceMaxLabel").style.backgroundColor = "yellow";
+                    // reset after 2 seconds (2000 ms)
+                    setTimeout(() => {
+                        document.getElementById("varianceMax").style.backgroundColor = "burlywood";
+                        document.getElementById("varianceMaxLabel").style.backgroundColor = "burlywood";
+                    }, 2000);
+                }
+                else if (cellID == "-") {
+                    document.getElementById("varianceMin").style.backgroundColor = "yellow";
+                    document.getElementById("varianceMinLabel").style.backgroundColor = "yellow";
+                    // reset after 2 seconds (2000 ms)
+                    setTimeout(() => {
+                        document.getElementById("varianceMin").style.backgroundColor = "burlywood";
+                        document.getElementById("varianceMinLabel").style.backgroundColor = "burlywood";
+                    }, 2000);
+                }
+                return;
+            }
+
+            //if click on an empty cell
+            let clickContent = document.getElementById(cellID).innerText;
+
+            const locations = cellID.split("-");
+            let rowString = locations[0];
+            let colString = locations[1];
+            let row = parseInt(rowString);
+            let col = parseInt(colString);
+            if (row <= 3 || col <= 3 || (row > 23 && col <4) || (col > 23 && row < 4)) {
+                return;
+            }
+            else if (row == 24 && col >=4 && col <24) {
+                //horinzontal averages
+                tooltip.innerText = "Average of the highlighted column";
+            }
+            else if (col == 24 && row >= 4 && row < 24) {
+                //vertical averages
+                tooltip.innerText = "Average of the highlighted row";
+            }
+            else if (row == 24 && col == 24) {
+                tooltip.innerText = "This is the average of averages (column or row). This is the values of Cliff's delta, see it highlighted on the left-hand side in yellow.";
+                document.getElementById("deltaLabel").style.backgroundColor = "yellow";
+                document.getElementById("delta").style.backgroundColor = "yellow";
+                // reset after 2 seconds (2000 ms)
+                setTimeout(() => {
+                    document.getElementById("deltaLabel").style.backgroundColor = "burlywood";
+                    document.getElementById("delta").style.backgroundColor = "burlywood";
+                }, 2000);
+            }
+            else {
+                //get the horizontal row value
+
+
+                horzintalCellValue = document.getElementById("1-" + colString).innerText;
+                verticalCellValue = document.getElementById(rowString + "-1").innerText;
+                horizontalInt = parseInt(horzintalCellValue);
+                verticalInt = parseInt(verticalCellValue);
+                console.log("horizontal location is: " + "1-" + colString);
+                console.log("vertical location is: " + rowString + "-1");
+
+
+                if (horizontalInt == verticalInt) {
+                    tooltip.innerText = "Group 1 value: " + horzintalCellValue + " == Group 2 value: " + verticalCellValue + "\n----------------RESULT: 0----------------";
+                }
+                else if (horizontalInt < verticalInt) {
+                    tooltip.innerText = "Group 1 value: " + horzintalCellValue + " < Group 2 value: " + verticalCellValue + "\n----------------RESULT: -1----------------";
+                }
+                else {
+                    tooltip.innerText = "Group 1 value: " + horzintalCellValue + " > Group 2 value: " + verticalCellValue + "\n----------------RESULT: 1----------------";
+                }
+
+
+
+                
+            }
+
+            // Position tooltip below the cell
+            const rect = document.getElementById(cellID).getBoundingClientRect();
+            tooltip.style.left = rect.left + window.scrollX + "px";
+            tooltip.style.top = rect.bottom + window.scrollY + "px";
+
+            tooltip.style.visibility = "visible";
+            tooltip.style.opacity = "1";
+
+            // Hide tooltip if clicked anywhere else
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest("td")) {
+                    tooltip.style.visibility = "hidden";
+                    tooltip.style.opacity = "0";
+                }
+            });
+
+            setTimeout(() => {
+                tooltip.style.visibility = "hidden";
+                tooltip.style.opacity = "0";
+            }, 2000);
+        }
+
+        function sortArrays() {
+            // Create an empty array for verticalValues
+
+                
+
+            let verticalValuesArray = [];
+            for (let row = 4; row < 24; row++) {
+                let col = 1;
+                let cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                cellValueInt = parseInt(cellValue);
+                verticalValuesArray.push(cellValueInt);
+                
+            }
+            verticalValuesArray.sort((a, b) => a - b);
+            let i = 0;
+            for (let row = 4; row < 24; row++) {
+                let col = 1;
+                document.getElementById(row.toString() + "-" + col.toString()).innerText = verticalValuesArray[i];
+                i = i + 1;
+            }
+
+
+            let horiontalValuesArray = [];
+            for (let col = 4; col < 24; col++) {
+                let row = 1;
+                let cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                cellValueInt = parseInt(cellValue);
+                horiontalValuesArray.push(cellValueInt);
+
+            }
+            horiontalValuesArray.sort((a, b) => a - b);
+            i = 0;
+            for (let col = 4; col < 24; col++) {
+                let row = 1;
+                document.getElementById(row.toString() + "-" + col.toString()).innerText = horiontalValuesArray[i];
+                i = i + 1;
+            }
+
+            calculateDominanceMatrix();
+            
+        }
+
+        function calculateDominanceMatrix() {
+            for (let row = 4; row < 24; row++) {
+                //grab the value from the vertical column
+                rowValue = document.getElementById(row.toString() + "-1").innerText;
+                rowValueInt = parseInt(rowValue);
+                for (let col = 4; col < 24; col++) {
+                    colValue = document.getElementById("1-" + col.toString()).innerText;
+                    colValueInt = parseInt(colValue);
+
+                    if (rowValueInt > colValueInt) {//this means vertical wins and go -1 with pink
+                        document.getElementById(row.toString() + "-" + col.toString()).innerText = "-1";
+                        document.getElementById(row + "-" + col).style.backgroundColor = "pink";
+                    }
+                    else if (rowValueInt < colValueInt) {
+                        document.getElementById(row.toString() + "-" + col.toString()).innerText = "1";
+                        document.getElementById(row + "-" + col).style.backgroundColor = "cyan";
+                    }
+                    else {
+                        document.getElementById(row.toString() + "-" + col.toString()).innerText = "0";
+                        document.getElementById(row + "-" + col).style.backgroundColor = "white";
+                    }
+                }
+            }
+
+
+            let verticalAverages = [];
+            //calculating the vertical averages
+            for (let row = 4; row < 24; row++) {
+                let col = 24;
+                let rowArray = [];
+
+                for (let col = 4; col < 24; col++) {
+                    cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                    cellValueInt = parseInt(cellValue);
+                    rowArray.push(cellValueInt);
+                }
+
+                var total = 0;
+                for (var i = 0; i < rowArray.length; i++) {
+                    total += rowArray[i];
+                }
+                var rowAverage = total / rowArray.length;
+                verticalAverages.push(rowAverage);
+
+                document.getElementById(row.toString() + "-" + col.toString()).innerText = (rowAverage.toFixed(3)).toString();
+            }
+
+            let horizontalAverages = [];
+            //calculating the horizontal averages
+            for (let col = 4; col < 24; col++) {
+                let row = 24;
+                let colArray = [];
+
+                for (let row = 4; row < 24; row++) {
+                    cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                    cellValueInt = parseInt(cellValue);
+                    colArray.push(cellValueInt);
+                }
+
+                var total = 0;
+                for (var i = 0; i < colArray.length; i++) {
+                    total += colArray[i];
+                }
+                var colAverage = total / colArray.length;
+                horizontalAverages.push(colAverage);
+                document.getElementById(row.toString() + "-" + col.toString()).innerText = (colAverage.toFixed(3)).toString();
+            }
+
+
+            var verticalAveragesSum = 0;
+            for (i = 0; i < verticalAverages.length; i++) {
+                verticalAveragesSum = verticalAveragesSum + verticalAverages[i]
+            }
+
+            let averageOfAverages = verticalAveragesSum / verticalAverages.length;// we calculate it using the vertical averages array but this could also be calculated by the horizontal averages array
+
+            console.log("Average of averages values: " + averageOfAverages);
+
+            document.getElementById("24-24").innerText = averageOfAverages.toFixed(3);
+            document.getElementById("24-24").style.backgroundColor = "gold";
+            document.getElementById("24-24").style.border = "1px solid black";
+
+            console.log("Vertical averages : " + verticalAverages);
+            console.log("Horizontal averages : " + horizontalAverages);
+
+
+            let di = devsq(verticalAverages, averageOfAverages);
+            let dj = devsq(horizontalAverages, averageOfAverages);
+
+            let bigList = [];
+
+            for (row = 4; row < 24; row++) {
+                for (col = 4; col < 24; col++) {
+                    cellValue = document.getElementById(row.toString() + "-" + col.toString()).innerText;
+                    cellValueInt = parseInt(cellValue);
+                    bigList.push(cellValueInt);
+                }
+            }
+
+
+            let dij = devsq(bigList, averageOfAverages) / (19 * 19); //((cols - 1) * (rows - 1))
+
+
+            let sumDs = di + dj + dij;
+            let n1xn2 = 20 * 20; //this is the number of rows * number of cols. For this tutorial it is set at 20 each
+            let sdc2 = sumDs / n1xn2; //This is your variance
+            let delta = averageOfAverages; //This is Cliff's delta
+            let z = 1.96;
+            let zSquared = z ** 2;
+            let sdc = sdc2 ** 0.5;
+
+            let varianceMax = (delta - (delta ** 3) + (z * sdc * ((((1 - (delta ** 2)) ** 2 + (zSquared) * sdc2) ** 0.5)))) / (1 - (delta ** 2) + (zSquared) * sdc2)
+            let varianceMin = (delta - (delta ** 3) - (z * sdc * ((((1 - (delta ** 2)) ** 2 + (zSquared) * sdc2) ** 0.5)))) / (1 - (delta ** 2) + (zSquared) * sdc2)
+
+            console.log("di : " + di);
+            console.log("dj : " + dj);
+            console.log("dij: " + dij);
+            console.log("Delta: " + delta);
+            console.log("variance: " + sdc2);
+            console.log("varianceMax: " + varianceMax);
+            console.log("varianceMin: " + varianceMin);
+
+            if (varianceMax > 0 && varianceMin > 0) {
+                document.getElementById("group1lightbulb").className = "redBulbOff";
+                document.getElementById("group2lightbulb").className = "blueBulbOn";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are greater than 0. Then there is statistical significance showing that Group 2 > Group 1.";
+            }
+            else if (varianceMax < 0 && varianceMin < 0) {
+                document.getElementById("group1lightbulb").className = "redBulbOn";
+                document.getElementById("group2lightbulb").className = "blueBulbOff";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are less than 0. Then there is statistical significance showing that Group 1 > Group 2.";
+            }
+            else {
+                document.getElementById("group1lightbulb").className = "redBulbOff";
+                document.getElementById("group2lightbulb").className = "blueBulbOff";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) surround 0. Then there is no statistical significance between the two groups.";
+            }
+
+            document.getElementById("delta").innerText = (delta.toFixed(5)).toString();
+            document.getElementById("cliffSlider").value = delta.toFixed(3);
+            document.getElementById("valueLabel").textContent = "d: " + delta.toFixed(3); 
+            document.getElementById("variance").innerText = (sdc2.toFixed(5)).toString();
+            document.getElementById("varianceMax").innerText = (varianceMax.toFixed(5)).toString();
+            document.getElementById("varianceMin").innerText = (varianceMin.toFixed(5)).toString();
+            document.getElementById("variancePlusSlider").textContent = "+"; 
+            document.getElementById("varianceMinusSlider").textContent = "-"; 
+
+            slider = document.getElementById("cliffSlider");
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(delta);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            valueLabel.style.left = thumbX + "px";
+
+
+            variancePlusSlider = document.getElementById("variancePlusSlider");
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(varianceMax);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            variancePlusSlider.style.left = thumbX + "px";
+
+
+            varianceMinusSlider = document.getElementById("varianceMinusSlider")
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(varianceMin);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            varianceMinusSlider.style.left = thumbX + "px";
+        }
+
+        function devsq(listx, average) {
+            console.log("CALL TO DEVSQ: " + listx.length);
+            let differencesList = [];
+            for (let i = 0; i < listx.length; i++) {
+                var sqdev = (listx[i] - average) ** 2;
+                differencesList.push(sqdev);
+            }
+
+            sum = 0;
+            for (let i = 0; i < differencesList.length; i++) {
+                sum = sum + differencesList[i];
+            }
+
+            return sum;
+        }
+
+    </script>
+</head>
+<body onload="siteLoading()">
+
+    <div class="container">
+        <button class="button" id="cliffsDeltaBtn" onclick="sortArrays()">Sort Dominance Matrix</button>
+        <div class="box" id="deltaLabel">Cliff's Delta:</div><div id="delta">0</div>
+        <div class="box">Variance: </div><div id="variance">0</div>
+        <div class="box" id="varianceMaxLabel">Variance+ : </div><div id="varianceMax">0</div>
+        <div class="box" id="varianceMinLabel">Variance- : </div><div id="varianceMin">0</div>
+        <a href="CliffCalculator.html">
+            <button class="button" id="cliffsDeltaBtn">Switch to Calculator Mode</button>
+        </a>
+    </div>
+
+
+    <p style="color:black">
+        This is a web applicatoin to compute Cliff’s delta effect size. Cliff’s delta is a robust and intuitive measure of effect size that reflects the degree of difference between two groups of data. Unlike commonly used effect-size tests such as Cohen’s d, Cliff’s delta does not rely on the assumption of normally distributed data. This makes it especially appropriate for non-normal or ordinal data, where variance is reduced. Even when normality assumptions are met, using Cliff’s delta carries no disadvantage.
+        <br />
+        <br />
+        The calculation of Cliff’s delta involves comparing every value in one group with every value in the other group, which requires access to the raw dataset rather than summary statistics like means and standard deviations. The resulting statistic ranges from –1 to +1: values near the extremes indicate no overlap between groups, while 0 signifies complete overlap. If both the maximum and minimum variances are above or below 0, then statistical significance is observed by one of the groups (Group A > Group B). The sign of the statistic reflects which group has larger values, depending on how the groups are ordered (e.g., which one is entered as Column 1), though the absolute magnitude remains unaffected by this choice.
+        <br />
+        <br />
+        This page is the insight mode showing the dominance matrix and calculations of Cliff's delta and other statistics. The educational mode is to provide insight only and has a limit n-values of 20 per group. If you have your data ready and want to actually calculate Cliff's delta then click on the "Switch to Calculator Mode" button.
+    </p>
+
+    <div class="group2">Group 2</div>
+
+
+    <table id="middleTable">
+        <tr>
+            <td style="border: none; vertical-align: middle; width: 2%">
+                <div class="group1">Group 1</div>
+            </td>
+
+            <td style="border: none; width: 90% ">
+                <table id="cliffsTable">
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 30px; text-align: left;" colspan="2">
+                <strong>Interpretation:</strong>
+                <br />
+                <div style="font-size: 20px;" id="interpretation">Since both the Variance (max.) and Variance (min.) surround 0. Then there is no statistical significance between the two groups. </div>
+                <br />
+            </td>
+        </tr>
+    </table>
+
+
+
+
+
+    <div id="tooltip" class="tooltip"></div>
+
+
+
+    <table style="width:100%; max-width:750px; margin:0 auto; border-collapse:collapse;">
+        <tr>
+            <td colspan="2">
+                <div class="slider-container">
+                    <input type="range" id="cliffSlider" class="slider" min="-1" max="1" step="0.01" value="0" disabled>
+                    <div class="marker"></div>
+                    <div class="left-marker"></div>
+                    <div class="right-marker"></div>
+                    <div class="label label-left">-1</div>
+                    <div class="label label-center"></div>
+                    <div class="label label-right">+1</div>
+                    <div id="valueLabel" class="value-label" onclick="cellClicked('cliffsDelta')">d: 0</div>
+                    <div id="variancePlusSlider" class="value-label" onclick="cellClicked('+')">+</div>
+                    <div id="varianceMinusSlider" class="value-label" onclick="cellClicked('-')">-</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; padding: 5px; font-size: 15px;">
+                <div id="group1lightbulb" class="redBulbOff"></div>
+                <br />
+                Statistical significance for Group 1. <br />
+                Both the "+ve" and "-ve" variances are below 0.
+            </td>
+            <td style="text-align: center; padding: 5px; font-size: 15px;">
+                <div id="group2lightbulb" class="blueBulbOff"></div>
+                <br />
+                Statistical significance for Group 2. <br />
+                Both the "+ve" and "-ve" variances are above 0.
+            </td>
+        </tr>
+    </table>
+
+
+</body>
+</html >

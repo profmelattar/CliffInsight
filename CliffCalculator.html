@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+
+        .blueBulbOff {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #000066; /* off state */
+            box-shadow: 0 0 5px #000033; /* subtle dark glow */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .blueBulbOn {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: blue; /* bright blue for "on" */
+            box-shadow: 0 0 20px blue; /* glowing effect */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .redBulbOff {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #660000; /* off state */
+            box-shadow: 0 0 5px #330000; /* subtle dark glow */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .redBulbOn {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: red; /* bright red for "on" */
+            box-shadow: 0 0 20px red; /* glowing effect */
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 50%; /* make it a circle */
+        }
+        .wrapper {
+            display: flex;
+            align-items: center; /* vertically align */
+            gap: 0px; /* space between label & table */
+        }
+        .group1 {
+            display: flex;
+            justify-content: center; /* center horizontally */
+            align-items: center; /* center vertically */
+            font-family: Verdana, sans-serif;
+            font-size: 30px;
+            color: red;
+            padding: 10px;
+        }
+        .container {
+            display: flex;
+            gap: 10px; /* space between divs */
+            font-size: 20px;
+            font-family: Verdana, sans-serif;
+            text-align: center;
+            background-color: burlywood;
+            padding: 20px;
+        }
+
+        .box {
+            flex: 1; /* make all equal width */
+            background: burlywood;
+            text-align: right;
+        }
+        .group2 {
+            display: flex;
+            justify-content: center; /* center horizontally */
+            align-items: center; /* center vertically */
+            font-family: Verdana, sans-serif;
+            font-size: 30px;
+            color: blue;
+            padding: 10px;
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 0 auto;
+            background: lightblue;
+            width: 700px;
+            height: 70px;
+            color: red;
+        }
+
+        /* The slider itself */
+        .slider {
+            width: 100%;
+            height: 25px;
+            pointer-events: none; /* prevent user dragging */
+            color: red;
+            background: red;
+        }
+
+        /* Zero marker */
+        .marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 30px;
+            background: black;
+            color: black;
+        }
+
+        /* -1 marker */
+        .left-marker {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 30px;
+            background: black;
+            font: bold;
+        }
+
+        /* +1 marker */
+        .right-marker {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 30px;
+            background: black;
+            font: bold;
+        }
+
+        /* Floating value label */
+        .value-label {
+            position: absolute;
+            top: 40px;
+            background: lightblue;
+            color: black;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        /* Labels */
+        .label {
+            position: absolute;
+            top: 55%;
+            margin-top: 5px;
+            font-size: 24px;
+            color: black;
+        }
+
+        .label-left {
+            left: 0;
+            transform: translateX(-100%);
+            color: black;
+        }
+
+        .label-center {
+            left: 50%;
+            transform: translateX(0%);
+            color: black;
+        }
+
+        .label-right {
+            right: 0;
+            transform: translateX(50%);
+            color: black;
+        }
+        p {
+            padding: 6px ;
+            font-size: 20px;
+            color: white;
+            display: block;
+        }
+
+        table {
+            border: none;
+            border-collapse: collapse; /* compact borders */
+            margin: 0 auto; /* center it */
+            width: auto; /* let it size to contents */
+        }
+
+
+        td {
+            border: none;
+            height: 20px;
+            width: 20px;
+            padding: 10px; /* no extra spacing */
+            text-align: center;
+        }
+
+        .button {
+            background-color:  lightgray;
+            border: solid;
+            border-color: black;
+            color: black;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-table;
+            font-family: Verdana, sans-serif;
+            font-size: 20px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .plusminusbutton {
+            width: 100%;
+            height: 100%;
+            display: block; /* ensures it expands */
+            box-sizing: border-box; /* ensures padding/border stay inside */
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: lightyellow;
+            color: cornflowerblue;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-family: Verdana, sans-serif;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+    </style>
+    <script>
+
+        function siteLoading() {
+            
+
+            delta = 0;
+            slider = document.getElementById("cliffSlider");
+            valueLabel = document.getElementById("valueLabel");
+            valueLabel.textContent = "d: " + delta;
+
+            // Position label above slider thumb
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(delta);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            valueLabel.style.left = thumbX + "px";
+
+
+            document.getElementById('group1data').addEventListener('paste', function (event) {
+                // Prevent the default paste behavior (which would be blocked by readonly)
+                event.preventDefault();
+
+                // Get the pasted text from the clipboard
+                const pastedText = event.clipboardData.getData('text/plain');
+
+                // Insert the pasted text at the current cursor position or append it
+                const textarea = event.target;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const currentValue = textarea.value;
+
+                textarea.value = currentValue.substring(0, start) + pastedText + currentValue.substring(end);
+
+                // Optionally, update the cursor position
+                textarea.selectionStart = textarea.selectionEnd = start + pastedText.length;
+            });
+
+            document.getElementById('group2data').addEventListener('paste', function (event) {
+                // Prevent the default paste behavior (which would be blocked by readonly)
+                event.preventDefault();
+
+                // Get the pasted text from the clipboard
+                const pastedText = event.clipboardData.getData('text/plain');
+
+                // Insert the pasted text at the current cursor position or append it
+                const textarea = event.target;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const currentValue = textarea.value;
+
+                textarea.value = currentValue.substring(0, start) + pastedText + currentValue.substring(end);
+
+                // Optionally, update the cursor position
+                textarea.selectionStart = textarea.selectionEnd = start + pastedText.length;
+            });
+            
+        }
+
+        function resetValues() {
+            //resetting the vertical column
+            for (let row = 4; row < 24; row++) {
+                let col = 1
+                document.getElementById(row + "-" + col).style.backgroundColor = "pink";
+                document.getElementById(row + "-" + col).innerText = 0;
+                document.getElementById(row + "-" + col).setAttribute("contenteditable", "true");
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                cell = document.getElementById(row + "-" + col);
+                cell.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault(); // prevent new line
+                        calculateDominanceMatrix();
+                        cell.blur();
+                    }
+                });
+
+                cell.addEventListener("blur", () => {
+                    calculateDominanceMatrix();
+                });
+            }
+
+            for (let row = 4; row < 24; row++) {
+                let col = 24;
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                document.getElementById(row + "-" + col).style.backgroundColor = "LightGreen";
+                document.getElementById(row + "-" + col).innerText = 0;
+            }
+
+            //resetting the horizontal column
+            for (let col = 4; col < 24; col++) {
+                let row = 1
+                document.getElementById(row + "-" + col).style.backgroundColor = "cyan";
+                document.getElementById(row + "-" + col).innerText = 0;
+                document.getElementById(row + "-" + col).setAttribute("contenteditable", "true");
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                cell = document.getElementById(row + "-" + col);
+                cell.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault(); // prevent new line
+                        calculateDominanceMatrix();
+                        cell.blur();
+                    }
+                });
+
+                cell.addEventListener("blur", () => {
+                    calculateDominanceMatrix();
+                });
+            }
+
+            for (let col = 4; col < 24; col++) {
+                let row = 24;
+                document.getElementById(row + "-" + col).style.border = "1px solid black";
+                document.getElementById(row + "-" + col).style.backgroundColor = "LemonChiffon";
+                document.getElementById(row + "-" + col).innerText = 0;
+            }
+
+            document.getElementById("valueLabel").style.fontSize = "16px";
+            document.getElementById("variancePlusSlider").style.color = "red"
+            document.getElementById("variancePlusSlider").style.fontSize = "20px";
+            document.getElementById("varianceMinusSlider").style.color = "blue"
+            document.getElementById("varianceMinusSlider").style.fontSize = "20px";
+        }
+  
+        function calculateDominanceMatrix(group1data, group2data) {
+
+            vertical = group1data.sort();
+            horizontal = group2data.sort();
+
+            cols = horizontal.length;
+            rows = vertical.length;
+
+            let nestedList = [];
+
+            for (i = 0; i < rows; i++) {
+                currentRow = [];
+
+                for (j = 0; j < cols; j++) {
+                    if (horizontal[j] > vertical[i]) {
+                        currentRow.push(1);
+                    }
+                    else if (horizontal[j] < vertical[i]) {
+                        currentRow.push(-1);
+                    }
+                    else {
+                        currentRow.push(0);
+                    }
+                }
+
+                nestedList.push(currentRow);
+            }
+
+
+            let verticalAverages = [];
+            //calculating the vertical averages
+            for (i = 0; i < nestedList.length; i++) {
+                sum = 0;
+                row = nestedList[i];
+                for (j = 0; j < row.length; j++) {
+                    sum = sum + row[j];
+                }
+                average = sum / row.length;
+                verticalAverages.push(average);
+            }
+
+
+
+            let horizontalAverages = [];
+            //calculating the horizontal averages
+            for (i = 0; i < nestedList[0].length; i++) {
+                listAdded = [];
+                for (j = 0; j < nestedList.length; j++) {
+                    listAdded.push(nestedList[j][i]);
+                }
+
+                sum = 0
+
+                for (j = 0; j < listAdded.length; j++) {
+                    sum = sum + listAdded[j];
+                }
+
+                average = sum / listAdded.length;
+                horizontalAverages.push(average);
+            }
+
+
+
+            var verticalAveragesSum = 0;
+            for (i = 0; i < verticalAverages.length; i++) {
+                verticalAveragesSum = verticalAveragesSum + verticalAverages[i]
+            }
+
+            let averageOfAverages = verticalAveragesSum / verticalAverages.length;// we calculate it using the vertical averages array but this could also be calculated by the horizontal averages array
+
+            console.log("Average of averages values: " + averageOfAverages);
+
+            console.log("Vertical averages : " + verticalAverages);
+            console.log("Horizontal averages : " + horizontalAverages);
+
+            let di = devsq(verticalAverages, averageOfAverages);
+            let dj = devsq(horizontalAverages, averageOfAverages);
+
+            let bigList = [];
+
+            for (row = 0; row < nestedList.length; row++) {
+                for (col = 0; col < nestedList[row].length; col++) {
+                    cellValueInt = nestedList[row][col];
+                    bigList.push(cellValueInt);
+                }
+            }
+
+
+            let dij = devsq(bigList, averageOfAverages) / (rows * cols); 
+
+
+            let sumDs = di + dj + dij;
+            let n1xn2 = 20 * 20; //this is the number of rows * number of cols. For this tutorial it is set at 20 each
+            let sdc2 = sumDs / n1xn2; //This is your variance
+            let delta = averageOfAverages; //This is Cliff's delta
+            let z = 1.96;
+            let zSquared = z ** 2;
+            let sdc = sdc2 ** 0.5;
+
+            let varianceMax = (delta - (delta ** 3) + (z * sdc * ((((1 - (delta ** 2)) ** 2 + (zSquared) * sdc2) ** 0.5)))) / (1 - (delta ** 2) + (zSquared) * sdc2)
+            let varianceMin = (delta - (delta ** 3) - (z * sdc * ((((1 - (delta ** 2)) ** 2 + (zSquared) * sdc2) ** 0.5)))) / (1 - (delta ** 2) + (zSquared) * sdc2)
+
+            console.log("di : " + di);
+            console.log("dj : " + dj);
+            console.log("dij: " + dij);
+            console.log("Delta: " + delta);
+            console.log("variance: " + sdc2);
+            console.log("varianceMax: " + varianceMax);
+            console.log("varianceMin: " + varianceMin);
+            group1name = document.getElementById("group1name").innerText;
+            group2name = document.getElementById("group2name").innerText;
+
+            if (varianceMax > 0 && varianceMin > 0) {
+                document.getElementById("group1lightbulb").className = "redBulbOff";
+                document.getElementById("group2lightbulb").className = "blueBulbOn";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are greater than 0. Then there is statistical significance showing that " + group2name + " > " + group1name + ".";
+            }
+            else if (varianceMax < 0 && varianceMin < 0) {
+                document.getElementById("group1lightbulb").className = "redBulbOn";
+                document.getElementById("group2lightbulb").className = "blueBulbOff";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are less than 0. Then there is statistical significance showing that " + group1name + " > " + group2name + ".";
+            }
+            else {
+                document.getElementById("group1lightbulb").className = "redBulbOff";
+                document.getElementById("group2lightbulb").className = "blueBulbOff";
+                document.getElementById("interpretation").innerText= "Since both the Variance(max.) and Variance(min.) surround 0. Then there is no statistical significance between the two groups.";
+            }
+
+            document.getElementById("delta").innerText = (delta.toFixed(5)).toString();
+            document.getElementById("cliffSlider").value = delta.toFixed(3);
+            document.getElementById("valueLabel").textContent = "d: " + delta.toFixed(3); 
+            document.getElementById("variance").innerText = (sdc2.toFixed(5)).toString();
+            document.getElementById("varianceMax").innerText = (varianceMax.toFixed(5)).toString();
+            document.getElementById("varianceMin").innerText = (varianceMin.toFixed(5)).toString();
+            document.getElementById("variancePlusSlider").textContent = "+"; 
+            document.getElementById("varianceMinusSlider").textContent = "-"; 
+
+            slider = document.getElementById("cliffSlider");
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(delta);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            valueLabel.style.left = thumbX + "px";
+
+
+            variancePlusSlider = document.getElementById("variancePlusSlider");
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(varianceMax);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            variancePlusSlider.style.left = thumbX + "px";
+
+
+            varianceMinusSlider = document.getElementById("varianceMinusSlider")
+            sliderWidth = slider.offsetWidth;
+            min = parseFloat(slider.min);
+            max = parseFloat(slider.max);
+            val = parseFloat(varianceMin);
+
+            percent = (val - min) / (max - min); // 0 to 1
+            thumbX = percent * sliderWidth;
+
+            varianceMinusSlider.style.left = thumbX + "px";
+        }
+
+        function devsq(listx, average) {
+            console.log("CALL TO DEVSQ: " + listx.length);
+            let differencesList = [];
+            for (let i = 0; i < listx.length; i++) {
+                var sqdev = (listx[i] - average) ** 2;
+                differencesList.push(sqdev);
+            }
+
+            sum = 0;
+            for (let i = 0; i < differencesList.length; i++) {
+                sum = sum + differencesList[i];
+            }
+
+            return sum;
+        }
+
+        function sanitizeInput(groupName) {
+            groupdata = document.getElementById(groupName).value;
+            groupArray = groupdata.split('\n');
+
+            for (i = 0; i < groupArray.length; i++) {
+
+                groupArray[i] = parseFloat(groupArray[i]);
+                if (isNaN(groupArray[i])) {
+                    groupArray.splice(i, 1);
+                }
+
+            }
+
+            /*
+            for (i = 0; i < groupArray.length; i++) {
+                groupArray[i] = parseFloat(groupArray[i]);
+            }
+            */
+            console.log(groupArray);
+
+            document.getElementById(groupName).value = groupArray.join("\n");
+            return groupArray;
+
+
+        }
+
+        function calculateCliffs() {
+            group1data = sanitizeInput("group1data");
+            group2data = sanitizeInput("group2data");
+            calculateDominanceMatrix(group1data, group2data);
+        }
+
+        function changeGroupName(cellID) {
+            editableDiv = document.getElementById(cellID);
+            currentValue = editableDiv.innerText.trim(); 
+
+            editableDiv.innerText = "";
+
+
+            editableDiv.addEventListener("blur", function () {
+                const value = editableDiv.innerText.trim(); // or innerHTML if you want formatting
+                if (value == "") {
+                    editableDiv.innerText = currentValue;
+                    return;
+                }
+
+                if (cellID == "group1name") {
+                    sliderDiv = document.getElementById("group1SliderName");
+                    sliderDiv.textContent = value;
+                }
+                else {
+                    sliderDiv = document.getElementById("group2SliderName");
+                    sliderDiv.textContent = value;
+                }
+                console.log("Value:", value);
+            });
+
+        }
+
+
+    </script>
+</head>
+<body onload="siteLoading()">
+
+    <div class="container">
+        <button class="button" id="calculateCalculator" onclick="calculateCliffs()">Calculate Cliff's Delta</button>
+        <div class="box" id="deltaLabel">Cliff's Delta:</div><div id="delta">0</div>
+        <div class="box">Variance: </div><div id="variance">0</div>
+        <div class="box" id="varianceMaxLabel">Variance+ : </div><div id="varianceMax">0</div>
+        <div class="box" id="varianceMinLabel">Variance- : </div><div id="varianceMin">0</div>
+        <a href="CliffsDelta.html">
+            <button class="button" id="cliffsDeltaBtn">Switch to Educational Mode</button>
+        </a>
+    </div>
+
+    <p style="color:black">
+        This is a web applicatoin to compute Cliff’s delta effect size. Cliff’s delta is a robust and intuitive measure of effect size that reflects the degree of difference between two groups of data. Unlike commonly used effect-size tests such as Cohen’s d, Cliff’s delta does not rely on the assumption of normally distributed data. This makes it especially appropriate for non-normal or ordinal data, where variance is reduced. Even when normality assumptions are met, using Cliff’s delta carries no disadvantage.
+        <br />
+        <br />
+        The calculation of Cliff’s delta involves comparing every value in one group with every value in the other group, which requires access to the raw dataset rather than summary statistics like means and standard deviations. The resulting statistic ranges from –1 to +1: values near the extremes indicate no overlap between groups, while 0 signifies complete overlap. If both the maximum and minimum variances are above or below 0, then statistical significance is observed by one of the groups (Group A > Group B). The sign of the statistic reflects which group has larger values, depending on how the groups are ordered (e.g., which one is entered as Column 1), though the absolute magnitude remains unaffected by this choice.
+        <br />
+        <br />
+        Click on the "Switch to Education Mode" to see the dominance matrix and how value changes affect the calculations of Cliff's delta and other statistics (note however the values you are using here will not be transfered to the educational mode).
+    </p>
+
+    <table>
+        <tr>
+            <td colspan="2">
+                Click to change the group (column) names (optional)
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="group1name" contenteditable="true" onclick="changeGroupName(this.id)"  class=" group1">Group 1</div>
+            </td>
+            <td>
+                <div id="group2name" contenteditable="true" onclick="changeGroupName(this.id)" class="group2">Group 2</div>
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea rows="50" cols="20" id="group1data" placeholder="This area is not edittable. Paste your group 1 data values here from your spreadsheet." readonly></textarea>
+            </td>
+            <td>
+                <textarea rows="50" cols="20" id="group2data" placeholder="This area is not edittable. Paste your group 2 data values here from your spreadsheet." readonly></textarea>
+            </td>
+            <td>
+                <table style="width:100%; max-width:550px; margin:0 auto; border-collapse:collapse;">
+                    <tr>
+                        <td colspan="2">
+                            <div style="font-size: 30px; text-align: left;">
+                                <strong>Interpretation:</strong>
+                                <br />
+                                <br />
+                                <div style="font-size: 22px;" id="interpretation">Since both the Variance (max.) and Variance (min.) surround 0. Then there is no statistical significance between the two groups.</div>
+                                <br />
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" id="cliffSlider" class="slider" min="-1" max="1" step="0.01" value="0" disabled>
+                                <div class="marker"></div>
+                                <div class="left-marker"></div>
+                                <div class="right-marker"></div>
+                                <div class="label label-left">-1</div>
+                                <div class="label label-center"></div>
+                                <div class="label label-right">+1</div>
+                                <div id="valueLabel" class="value-label" onclick="cellClicked('cliffsDelta')">d: 0</div>
+                                <div id="variancePlusSlider" class="value-label" onclick="cellClicked('+')">+</div>
+                                <div id="varianceMinusSlider" class="value-label" onclick="cellClicked('-')">-</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; padding: 5px; font-size: 15px;">
+                            <div id="group1lightbulb" class="redBulbOff"></div>
+                            <br />
+                            Statistical significance for <div id="group1SliderName">Group 1</div>. <br />
+                            Both the "+ve" and "-ve" variances are below 0.
+                        </td>
+                        <td style="text-align: center; padding: 5px; font-size: 15px;">
+                            <div id="group2lightbulb" class="blueBulbOff"></div>
+                            <br />
+                            Statistical significance for <div id="group2SliderName">Group 1</div>. <br />
+                            Both the "+ve" and "-ve" variances are above 0.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    
+
+    
+
+ 
+    <div id="tooltip" class="tooltip"></div>
+
+    
+
+
+</body>
+</html >
