@@ -446,11 +446,13 @@
             }
 
 
-            let dij = devsq(bigList, averageOfAverages) / (rows * cols); 
+            //let dij = devsq(bigList, averageOfAverages) / (rows * cols); 
+            let dij = devsq(bigList, averageOfAverages) / ((rows -1) * (cols - 1)); 
+            
 
 
             let sumDs = di + dj + dij;
-            let n1xn2 = 20 * 20; //this is the number of rows * number of cols. For this tutorial it is set at 20 each
+            let n1xn2 = rows * cols; 
             let sdc2 = sumDs / n1xn2; //This is your variance
             let delta = averageOfAverages; //This is Cliff's delta
             let z = 1.96;
@@ -473,12 +475,12 @@
             if (varianceMax > 0 && varianceMin > 0) {
                 document.getElementById("group1lightbulb").className = "redBulbOff";
                 document.getElementById("group2lightbulb").className = "blueBulbOn";
-                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are greater than 0. Then there is statistical significance showing that " + group2name + " > " + group1name + ".";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are greater than 0. Then there is statistical significance showing that " + group2name + " > " + group1name + ". This can also be interpreted in an inverse manner that there is a statistical siginifiance that " + group1name + " < " + group2name + ".";
             }
             else if (varianceMax < 0 && varianceMin < 0) {
                 document.getElementById("group1lightbulb").className = "redBulbOn";
                 document.getElementById("group2lightbulb").className = "blueBulbOff";
-                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are less than 0. Then there is statistical significance showing that " + group1name + " > " + group2name + ".";
+                document.getElementById("interpretation").innerText = "Since both the Variance(max.) and Variance(min.) are less than 0. Then there is statistical significance showing that " + group1name + " > " + group2name + ". This can also be interpreted in an inverse manner that there is a statistical siginifiance that " + group2name + " < " + group1name + ".";
             }
             else {
                 document.getElementById("group1lightbulb").className = "redBulbOff";
@@ -623,10 +625,10 @@
     </div>
 
     <p style="color:black">
-        This is a web applicatoin to compute Cliff's delta effect size. Cliff's delta is a robust and intuitive measure of effect size that reflects the degree of difference between two groups of data. Unlike commonly used effect-size tests such as Cohen's d, Cliff's delta does not rely on the assumption of normally distributed data. This makes it especially appropriate for non-normal or ordinal data, where variance is reduced. Even when normality assumptions are met, using Cliff's delta carries no disadvantage.
+        This is a web applicatoin to compute Cliff’s delta effect size. Cliff’s delta is a robust and intuitive measure of effect size that reflects the degree of difference between two groups of data. Unlike commonly used effect-size tests such as Cohen’s d, Cliff’s delta does not rely on the assumption of normally distributed data. This makes it especially appropriate for non-normal or ordinal data, where variance is reduced. Even when normality assumptions are met, using Cliff’s delta carries no disadvantage.
         <br />
         <br />
-        The calculation of Cliff's delta involves comparing every value in one group with every value in the other group, which requires access to the raw dataset rather than summary statistics like means and standard deviations. The resulting statistic ranges from 1 to +1: values near the extremes indicate no overlap between groups, while 0 signifies complete overlap. If both the maximum and minimum variances are above or below 0, then statistical significance is observed by one of the groups (Group A > Group B). The sign of the statistic reflects which group has larger values, depending on how the groups are ordered (e.g., which one is entered as Column 1), though the absolute magnitude remains unaffected by this choice.
+        The calculation of Cliff’s delta involves comparing every value in one group with every value in the other group, which requires access to the raw dataset rather than summary statistics like means and standard deviations. The resulting statistic ranges from –1 to +1: values near the extremes indicate no overlap between groups, while 0 signifies complete overlap. If both the maximum and minimum variances are above or below 0, then statistical significance is observed by one of the groups (Group A > Group B). The sign of the statistic reflects which group has larger values, depending on how the groups are ordered (e.g., which one is entered as Column 1), though the absolute magnitude remains unaffected by this choice.
         <br />
         <br />
         Click on the "Switch to Education Mode" to see the dominance matrix and how value changes affect the calculations of Cliff's delta and other statistics (note however the values you are using here will not be transfered to the educational mode).
@@ -714,4 +716,3 @@
 
 </body>
 </html >
-
