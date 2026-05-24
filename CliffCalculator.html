@@ -1,235 +1,629 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cliff's Delta &mdash; Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
 
-        .blueBulbOff {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: #000066; /* off state */
-            box-shadow: 0 0 5px #000033; /* subtle dark glow */
-            transition: background-color 0.3s, box-shadow 0.3s;
-            border-radius: 50%; /* make it a circle */
+        :root {
+            --bg:        #f4f1ea;
+            --surface:   #ffffff;
+            --ink:       #232020;
+            --ink-soft:  #5c5550;
+            --line:      #ddd6c9;
+            --accent:    #b5443a;   /* Group 1 */
+            --accent-2:  #2f5d7c;   /* Group 2 */
+            --g1-fill:   #f3d5d0;
+            --g2-fill:   #cfe0e9;
+            --neutral:   #faf8f3;
+            --gold:      #d8a13a;
+            --highlight: #f6e9a8;
+            --shadow:    0 1px 2px rgba(35,32,32,.06), 0 8px 24px rgba(35,32,32,.07);
         }
-        .blueBulbOn {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: blue; /* bright blue for "on" */
-            box-shadow: 0 0 20px blue; /* glowing effect */
-            transition: background-color 0.3s, box-shadow 0.3s;
-            border-radius: 50%; /* make it a circle */
+
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+
+        body {
+            background:
+                radial-gradient(900px 500px at 85% -8%, rgba(47,93,124,.07), transparent 60%),
+                radial-gradient(700px 460px at -5% 12%, rgba(181,68,58,.06), transparent 60%),
+                var(--bg);
+            color: var(--ink);
+            font-family: 'Spline Sans', system-ui, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding: 40px 24px 72px;
         }
-        .redBulbOff {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: #660000; /* off state */
-            box-shadow: 0 0 5px #330000; /* subtle dark glow */
-            transition: background-color 0.3s, box-shadow 0.3s;
-            border-radius: 50%; /* make it a circle */
+
+        .page { max-width: 1040px; margin: 0 auto; }
+
+        /* ---------- Masthead ---------- */
+        .masthead {
+            border-bottom: 2px solid var(--ink);
+            padding-bottom: 18px;
+            margin-bottom: 26px;
         }
-        .redBulbOn {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: red; /* bright red for "on" */
-            box-shadow: 0 0 20px red; /* glowing effect */
-            transition: background-color 0.3s, box-shadow 0.3s;
-            border-radius: 50%; /* make it a circle */
+        .eyebrow {
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 12px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 0 0 6px;
         }
-        .wrapper {
-            display: flex;
-            align-items: center; /* vertically align */
-            gap: 0px; /* space between label & table */
+        .masthead h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 600;
+            font-size: clamp(32px, 5vw, 50px);
+            line-height: 1.05;
+            letter-spacing: -.015em;
+            margin: 0;
         }
-        .group1 {
-            display: flex;
-            justify-content: center; /* center horizontally */
-            align-items: center; /* center vertically */
-            font-family: Verdana, sans-serif;
-            font-size: 30px;
-            color: red;
-            padding: 10px;
-        }
+        .masthead h1 em { font-style: italic; color: var(--accent-2); }
+        .masthead .tagline { margin: 8px 0 0; color: var(--ink-soft); font-size: 15px; }
+
+        /* ---------- Readout strip ---------- */
         .container {
             display: flex;
-            gap: 10px; /* space between divs */
-            font-size: 20px;
-            font-family: Verdana, sans-serif;
-            text-align: center;
-            background-color: burlywood;
-            padding: 20px;
+            flex-wrap: wrap;
+            align-items: stretch;
+            gap: 14px;
+            background: transparent;
+            padding: 0;
+            margin-bottom: 26px;
+            font-family: 'Spline Sans', sans-serif;
+            font-size: inherit;
+            text-align: left;
         }
 
+        /* the readout cards: label div + value div wrapped in a column */
         .box {
-            flex: 1; /* make all equal width */
-            background: burlywood;
-            text-align: right;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px 12px 0 0;
+            box-shadow: var(--shadow);
+            padding: 13px 16px 4px;
+            text-align: left;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 10.5px;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            transition: background-color .3s ease;
         }
-        .group2 {
-            display: flex;
-            justify-content: center; /* center horizontally */
-            align-items: center; /* center vertically */
-            font-family: Verdana, sans-serif;
-            font-size: 30px;
-            color: blue;
-            padding: 10px;
+        /* the value div immediately follows its label div */
+        .box + div {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: var(--shadow);
+            margin-top: -1px;
+            padding: 0 16px 14px;
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 26px;
+            line-height: 1;
+            color: var(--ink);
+            transition: background-color .3s ease;
         }
+        #deltaLabel { border-color: var(--gold); }
+        #deltaLabel + div { border-color: var(--gold); color: var(--accent); }
 
-        .slider-container {
-            position: relative;
-            margin: 0 auto;
-            background: lightblue;
-            width: 700px;
-            height: 70px;
-            color: red;
+        .button {
+            background: var(--ink);
+            border: 1px solid var(--ink);
+            border-radius: 12px;
+            color: #fff;
+            padding: 14px 22px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            cursor: pointer;
+            transition: transform .12s ease, background-color .2s ease;
+            box-shadow: var(--shadow);
         }
+        .button:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+        .button:active { transform: translateY(0); }
+        .container > a { text-decoration: none; display: flex; }
+        .container > a .button { width: 100%; }
 
-        /* The slider itself */
-        .slider {
-            width: 100%;
-            height: 25px;
-            pointer-events: none; /* prevent user dragging */
-            color: red;
-            background: red;
-        }
-
-        /* Zero marker */
-        .marker {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 2px;
-            height: 30px;
-            background: black;
-            color: black;
-        }
-
-        /* -1 marker */
-        .left-marker {
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            transform: translate(-50%, -50%);
-            width: 2px;
-            height: 30px;
-            background: black;
-            font: bold;
-        }
-
-        /* +1 marker */
-        .right-marker {
-            position: absolute;
-            top: 50%;
-            left: 0%;
-            transform: translate(-50%, -50%);
-            width: 2px;
-            height: 30px;
-            background: black;
-            font: bold;
-        }
-
-        /* Floating value label */
-        .value-label {
-            position: absolute;
-            top: 40px;
-            background: lightblue;
-            color: black;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-            transform: translateX(-50%);
-            white-space: nowrap;
-        }
-
-        /* Labels */
-        .label {
-            position: absolute;
-            top: 55%;
-            margin-top: 5px;
-            font-size: 24px;
-            color: black;
-        }
-
-        .label-left {
-            left: 0;
-            transform: translateX(-100%);
-            color: black;
-        }
-
-        .label-center {
-            left: 50%;
-            transform: translateX(0%);
-            color: black;
-        }
-
-        .label-right {
-            right: 0;
-            transform: translateX(50%);
-            color: black;
-        }
+        /* ---------- Intro prose ---------- */
         p {
-            padding: 6px ;
-            font-size: 20px;
-            color: white;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--accent-2);
+            border-radius: 12px 12px 0 0;
+            box-shadow: var(--shadow);
+            padding: 22px 26px;
+            margin: 0;
+            font-size: 15.5px;
+            color: var(--ink-soft);
             display: block;
         }
 
+        /* ---------- Group axis labels ---------- */
+        .group2 {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 22px;
+            color: var(--accent-2);
+            padding: 0 0 10px 4px;
+        }
+        .group2::before {
+            content: "";
+            display: inline-block;
+            width: 26px; height: 3px;
+            background: var(--accent-2);
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .group1 {
+            transform: rotate(-90deg);
+            display: inline-block;
+            text-align: center;
+            font-family: 'Fraunces', serif;
+            font-size: 22px;
+            font-weight: 600;
+            white-space: nowrap;
+            color: var(--accent);
+            padding: 0;
+        }
+
+        .wrapper { display: flex; align-items: center; gap: 0px; }
+
+        /* ---------- Matrix ---------- */
+        #middleTable {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 20px 22px;
+            width: 100%;
+        }
         table {
             border: none;
-            border-collapse: collapse; /* compact borders */
-            margin: 0 auto; /* center it */
-            width: auto; /* let it size to contents */
+            border-collapse: collapse;
+            width: 100%;
         }
-
-
         td {
             border: none;
-            height: 20px;
-            width: 20px;
-            padding: 10px; /* no extra spacing */
+            height: 22px;
+            padding: 0px;
+            background-color: var(--surface);
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 12.5px;
+            width: 22px;
+            overflow: hidden;
             text-align: center;
+            color: var(--ink);
         }
-
-        .button {
-            background-color:  lightgray;
-            border: solid;
-            border-color: black;
-            color: black;
-            padding: 10px 15px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-table;
-            font-family: Verdana, sans-serif;
-            font-size: 20px;
-            margin: 0 auto;
-            cursor: pointer;
-        }
+        #cliffsTable td { transition: background-color .15s ease; }
 
         .plusminusbutton {
             width: 100%;
             height: 100%;
-            display: block; /* ensures it expands */
-            box-sizing: border-box; /* ensures padding/border stay inside */
+            display: block;
+            box-sizing: border-box;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            color: var(--ink-soft);
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        .plusminusbutton:hover { background: var(--ink); color: #fff; }
+
+        #middleTable td[colspan="2"] { padding-top: 16px !important; }
+        #middleTable td[colspan="2"] strong {
+            font-family: 'Fraunces', serif !important;
+            font-weight: 600;
+            font-size: 20px !important;
+            color: var(--ink);
+        }
+        #interpretation {
+            font-family: 'Spline Sans', sans-serif !important;
+            font-size: 15px !important;
+            color: var(--ink-soft);
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 13px 15px;
+            margin-top: 8px;
         }
 
+        /* ---------- Size controls ---------- */
+        .controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 16px;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 22px;
+        }
+        .ctrl-group { display: flex; align-items: center; gap: 8px; }
+        .ctrl-label {
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 12px;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+        }
+        .ctrl-dot {
+            display: inline-block;
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .ctrl-dot.g1 { background: var(--accent); }
+        .ctrl-dot.g2 { background: var(--accent-2); }
+        .controls-bar input[type="number"] {
+            width: 60px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 7px 8px;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 14px;
+            color: var(--ink);
+            text-align: center;
+        }
+        .controls-bar input[type="number"]:focus {
+            outline: 2px solid var(--accent-2);
+            outline-offset: 1px;
+        }
+        .step-btn {
+            width: 32px; height: 34px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--ink);
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        .step-btn:hover { background: var(--ink); color: #fff; }
+        .step-btn:active { transform: translateY(1px); }
+        .button.compact {
+            padding: 9px 16px;
+            font-size: 13px;
+            border-radius: 9px;
+        }
+        .button.accent { background: var(--accent-2); border-color: var(--accent-2); }
+        .button.accent:hover { background: var(--accent); border-color: var(--accent); }
+        .ctrl-note {
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-left: auto;
+        }
+
+        /* ---------- Slider ---------- */
+        .slider-container {
+            position: relative;
+            margin: 0 auto;
+            background: linear-gradient(90deg, var(--g1-fill), var(--neutral) 50%, var(--g2-fill));
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            width: 700px;
+            max-width: 100%;
+            height: 70px;
+        }
+        .slider {
+            width: 100%;
+            height: 25px;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .marker {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px; height: 34px;
+            background: var(--ink);
+        }
+        .left-marker {
+            position: absolute;
+            top: 50%; left: 100%;
+            transform: translate(-50%, -50%);
+            width: 2px; height: 30px;
+            background: var(--ink-soft);
+        }
+        .right-marker {
+            position: absolute;
+            top: 50%; left: 0%;
+            transform: translate(-50%, -50%);
+            width: 2px; height: 30px;
+            background: var(--ink-soft);
+        }
+        .value-label {
+            position: absolute;
+            top: 42px;
+            background: var(--ink);
+            color: #fff;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 12px;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+        .label {
+            position: absolute;
+            top: 55%;
+            margin-top: 5px;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 18px;
+            color: var(--ink);
+        }
+        .label-left  { left: 0;  transform: translateX(-130%); color: var(--accent); }
+        .label-center{ left: 50%; transform: translateX(-50%); color: var(--ink-soft); font-size: 13px; }
+        .label-right { right: 0; transform: translateX(130%);  color: var(--accent-2); }
+
+        /* ---------- Bulbs ---------- */
+        .blueBulbOff, .blueBulbOn, .redBulbOff, .redBulbOn {
+            display: inline-block;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .blueBulbOff { background-color: #1f3543; box-shadow: inset 0 0 4px rgba(0,0,0,.4); }
+        .blueBulbOn  { background-color: var(--accent-2); box-shadow: 0 0 18px var(--accent-2); }
+        .redBulbOff  { background-color: #4a221f; box-shadow: inset 0 0 4px rgba(0,0,0,.4); }
+        .redBulbOn   { background-color: var(--accent); box-shadow: 0 0 18px var(--accent); }
+
+        /* significance panel */
+        .sig-panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 28px 24px 22px;
+            margin-top: 30px;
+        }
+        .sig-panel td {
+            background: transparent;
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 14px;
+            color: var(--ink-soft);
+            line-height: 1.55;
+        }
+
+        /* ---------- Tooltip ---------- */
         .tooltip {
             position: absolute;
-            background-color: lightyellow;
-            color: cornflowerblue;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-family: Verdana, sans-serif;
+            background-color: var(--ink);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 11px;
+            line-height: 1.5;
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
             z-index: 1000;
+            box-shadow: var(--shadow);
+            white-space: pre-line;
         }
+
+        @media (max-width: 760px) {
+            body { padding: 24px 14px 56px; }
+            #middleTable, .sig-panel { padding: 16px 12px; }
+        }
+
+        /* ---------- Calculator: data entry ---------- */
+        .data-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+        .data-col { flex: 1 1 220px; min-width: 220px; }
+        .data-col.results { flex: 2 1 380px; }
+
+        .group-name {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 22px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px dashed transparent;
+            cursor: text;
+            display: inline-block;
+            transform: none;
+            transition: border-color .15s ease, background-color .15s ease;
+        }
+        .group-name:hover { border-color: var(--line); background: var(--neutral); }
+        .group-name.group1 { color: var(--accent); }
+        .group-name.group2 { color: var(--accent-2); }
+        .group-name::before { content: none; }
+
+        .field-hint {
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 11px;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            margin: 0 0 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 340px;
+            resize: vertical;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--ink);
+        }
+        textarea:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+        textarea::placeholder { color: #a59d92; }
+
+        .results-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 22px 24px;
+        }
+
+        /* ---------- Primary action: Calculate button ---------- */
+        .calc-action {
+            margin: 0 0 30px;
+        }
+        .calc-action .button {
+            display: block;
+            width: 100%;
+            background: var(--accent-2);
+            border-color: var(--accent-2);
+            font-size: 16px;
+            padding: 16px 40px;
+        }
+        .calc-action .button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* ---------- Citation block ---------- */
+        .cite-panel {
+            background: linear-gradient(180deg, #fbf3dd 0%, var(--surface) 55%);
+            border: 1px solid var(--gold);
+            border-top: 3px solid var(--gold);
+            border-radius: 0 0 14px 14px;
+            box-shadow: var(--shadow);
+            padding: 24px 28px 26px;
+            margin: 0 0 32px;
+        }
+        .cite-panel::before {
+            content: "Citation requested";
+            display: inline-block;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 11px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: #9a6f1c;
+            background: var(--gold);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+        .cite-kind-note {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--accent-2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            font-size: 14.5px;
+            color: var(--ink-soft);
+        }
+        .cite-kind-note .heart {
+            flex: none;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+        .cite-panel h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 22px;
+            margin: 0 0 4px;
+            color: var(--ink);
+        }
+        .cite-panel .cite-sub {
+            margin: 0 0 18px;
+            font-size: 14px;
+            color: var(--ink-soft);
+        }
+        .cite-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .cite-tab {
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        .cite-tab:hover { color: var(--ink); }
+        .cite-tab.active {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink);
+        }
+        .cite-body {
+            position: relative;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .cite-text {
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--ink);
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0;
+        }
+        .cite-copy {
+            margin-top: 14px;
+            background: var(--accent-2);
+            border: 1px solid var(--accent-2);
+            border-radius: 9px;
+            color: #fff;
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 9px 18px;
+            cursor: pointer;
+            transition: background-color .15s ease, transform .12s ease;
+        }
+        .cite-copy:hover { background: var(--accent); border-color: var(--accent); }
+        .cite-copy:active { transform: translateY(1px); }
+        .cite-copy.copied { background: var(--green, #6f8f5f); border-color: var(--green, #6f8f5f); }
 
     </style>
     <script>
@@ -613,116 +1007,218 @@
 </head>
 <body onload="siteLoading()">
 
-    <div class="container">
-        <button class="button" id="calculateCalculator" onclick="calculateCliffs()">Calculate Cliff's Delta</button>
-        <div class="box" id="deltaLabel">Cliff's Delta:</div><div id="delta">0</div>
-        <div class="box">Variance: </div><div id="variance">0</div>
-        <div class="box" id="varianceMaxLabel">Variance+ : </div><div id="varianceMax">0</div>
-        <div class="box" id="varianceMinLabel">Variance- : </div><div id="varianceMin">0</div>
-        <a href="CliffsDelta.html">
-            <button class="button" id="cliffsDeltaBtn">Switch to Educational Mode</button>
-        </a>
-    </div>
+  <div class="page">
 
-    <p style="color:black">
-        This is a web applicatoin to compute Cliff's delta effect size. Cliff's delta is a robust and intuitive measure of effect size that reflects the degree of difference between two groups of data. Unlike commonly used effect-size tests such as Cohen's d, Cliff's delta does not rely on the assumption of normally distributed data. This makes it especially appropriate for non-normal or ordinal data, where variance is reduced. Even when normality assumptions are met, using Cliff's delta carries no disadvantage.
-        <br />
-        <br />
-        The calculation of Cliff's delta involves comparing every value in one group with every value in the other group, which requires access to the raw dataset rather than summary statistics like means and standard deviations. The resulting statistic ranges from -1 to +1: values near the extremes indicate no overlap between groups, while 0 signifies complete overlap. If both the maximum and minimum variances are above or below 0, then statistical significance is observed by one of the groups (Group A > Group B). The sign of the statistic reflects which group has larger values, depending on how the groups are ordered (e.g., which one is entered as Column 1), though the absolute magnitude remains unaffected by this choice.
-        <br />
-        <br />
-        Click on the "Switch to Education Mode" to see the dominance matrix and how value changes affect the calculations of Cliff's delta and other statistics (note however the values you are using here will not be transfered to the educational mode).
-        <br />
-        <br />
-        For a quick how-to transfer your data from your spreadsheet onto this tool please watch the video.
-        <br />
-        <br />
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/FnOcUJxYp0k?si=jlvxQkbKcKN3wo6f" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <header class="masthead">
+      <p class="eyebrow" style="background:none;border:none;box-shadow:none;padding:0;">Cliff's Delta &middot; Calculator</p>
+      <h1>Cliff's Delta, <em>from your data</em></h1>
+      <p class="tagline" style="background:none;border:none;box-shadow:none;padding:0;">Paste two groups of values and compute the effect size and its variance bounds.</p>
+    </header>
+
+    <p>
+      This is a web application to compute Cliff's delta effect size. Cliff's delta is a robust and intuitive measure of effect size that reflects the degree of difference between two groups of data. Unlike commonly used effect-size tests such as Cohen's d, Cliff's delta does not rely on the assumption of normally distributed data. This makes it especially appropriate for non-normal or ordinal data, where variance is reduced. Even when normality assumptions are met, using Cliff's delta carries no disadvantage.
+      <br /><br />
+      The calculation of Cliff's delta involves comparing every value in one group with every value in the other group, which requires access to the raw dataset rather than summary statistics like means and standard deviations. The resulting statistic ranges from &minus;1 to +1: values near the extremes indicate no overlap between groups, while 0 signifies complete overlap. If both the maximum and minimum variances are above or below 0, then statistical significance is observed by one of the groups (Group A &gt; Group B). The sign of the statistic reflects which group has larger values, depending on how the groups are ordered (e.g., which one is entered as Column 1), though the absolute magnitude remains unaffected by this choice.
+      <br /><br />
+      Click "Switch to Educational Mode" to see the dominance matrix and how value changes affect the calculations of Cliff's delta and other statistics. Note that the values you use here will not be transferred to the educational mode.
     </p>
 
-    <table>
-        <tr>
-            <td colspan="2">
-                Click to change the group (column) names (optional)
-            </td>
-            <td>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div id="group1name" contenteditable="true" onclick="changeGroupName(this.id)"  class=" group1">Group 1</div>
-            </td>
-            <td>
-                <div id="group2name" contenteditable="true" onclick="changeGroupName(this.id)" class="group2">Group 2</div>
-            </td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <textarea rows="50" cols="20" id="group1data" placeholder="This area is not edittable. Paste your group 1 data values here from your spreadsheet." readonly></textarea>
-            </td>
-            <td>
-                <textarea rows="50" cols="20" id="group2data" placeholder="This area is not edittable. Paste your group 2 data values here from your spreadsheet." readonly></textarea>
-            </td>
-            <td>
-                <table style="width:100%; max-width:550px; margin:0 auto; border-collapse:collapse;">
-                    <tr>
-                        <td colspan="2">
-                            <div style="font-size: 30px; text-align: left;">
-                                <strong>Interpretation:</strong>
-                                <br />
-                                <br />
-                                <div style="font-size: 22px;" id="interpretation">Since both the Variance (max.) and Variance (min.) surround 0. Then there is no statistical significance between the two groups.</div>
-                                <br />
-                            </div>
-                            <div class="slider-container">
-                                <input type="range" id="cliffSlider" class="slider" min="-1" max="1" step="0.01" value="0" disabled>
-                                <div class="marker"></div>
-                                <div class="left-marker"></div>
-                                <div class="right-marker"></div>
-                                <div class="label label-left">-1</div>
-                                <div class="label label-center"></div>
-                                <div class="label label-right">+1</div>
-                                <div id="valueLabel" class="value-label" onclick="cellClicked('cliffsDelta')">d: 0</div>
-                                <div id="variancePlusSlider" class="value-label" onclick="cellClicked('+')">+</div>
-                                <div id="varianceMinusSlider" class="value-label" onclick="cellClicked('-')">-</div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center; padding: 5px; font-size: 15px;">
-                            <div id="group1lightbulb" class="redBulbOff"></div>
-                            <br />
-                            Statistical significance for <div id="group1SliderName">Group 1</div>. <br />
-                            Both the "+ve" and "-ve" variances are below 0.
-                        </td>
-                        <td style="text-align: center; padding: 5px; font-size: 15px;">
-                            <div id="group2lightbulb" class="blueBulbOff"></div>
-                            <br />
-                            Statistical significance for <div id="group2SliderName">Group 1</div>. <br />
-                            Both the "+ve" and "-ve" variances are above 0.
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+    <section class="cite-panel">
+      <div class="cite-kind-note">
+        <span class="heart">&#9825;</span>
+        <span>Please be kind and respectful to others in any forum where you share this tool, and to fellow researchers whose work you build on. If CliffInsight helps your teaching or research, a citation is genuinely appreciated.</span>
+      </div>
 
-    
+      <h2>Cite this work</h2>
+      <p class="cite-sub">Choose a style and copy the formatted reference.</p>
 
-    
+      <div class="cite-tabs">
+        <button class="cite-tab active" data-style="apa" onclick="showCitation('apa')">APA</button>
+        <button class="cite-tab" data-style="ieee" onclick="showCitation('ieee')">IEEE</button>
+        <button class="cite-tab" data-style="acm" onclick="showCitation('acm')">ACM</button>
+        <button class="cite-tab" data-style="bibtex" onclick="showCitation('bibtex')">BibTeX</button>
+      </div>
 
- 
+      <div class="cite-body">
+        <pre class="cite-text" id="citationText"></pre>
+      </div>
+      <button class="cite-copy" id="citationCopyBtn" onclick="copyCitation()">Copy citation</button>
+    </section>
+
+    <div class="container">
+      <div style="display:flex;flex-direction:column;flex:1 1 150px;">
+        <div class="box" id="deltaLabel">Cliff's Delta</div><div id="delta">0</div>
+      </div>
+      <div style="display:flex;flex-direction:column;flex:1 1 150px;">
+        <div class="box">Variance</div><div id="variance">0</div>
+      </div>
+      <div style="display:flex;flex-direction:column;flex:1 1 150px;">
+        <div class="box" id="varianceMaxLabel">Variance +</div><div id="varianceMax">0</div>
+      </div>
+      <div style="display:flex;flex-direction:column;flex:1 1 150px;">
+        <div class="box" id="varianceMinLabel">Variance &minus;</div><div id="varianceMin">0</div>
+      </div>
+      <a href="CliffsDelta.html">
+        <button class="button" id="cliffsDeltaBtn">Switch to Educational Mode</button>
+      </a>
+    </div>
+
+    <div class="calc-action">
+      <button class="button" id="calculateCalculator" onclick="calculateCliffs()">Calculate Cliff's Delta</button>
+    </div>
+
+    <div class="data-grid">
+      <div class="data-col">
+        <p class="field-hint">Click the name to rename (optional)</p>
+        <div id="group1name" contenteditable="true" onclick="changeGroupName(this.id)" class="group-name group1">Group 1</div>
+        <p class="field-hint" style="margin-top:14px;">Paste Group 1 data</p>
+        <textarea rows="50" cols="20" id="group1data" placeholder="This area is not editable. Paste your Group 1 data values here from your spreadsheet." readonly></textarea>
+      </div>
+      <div class="data-col">
+        <p class="field-hint">Click the name to rename (optional)</p>
+        <div id="group2name" contenteditable="true" onclick="changeGroupName(this.id)" class="group-name group2">Group 2</div>
+        <p class="field-hint" style="margin-top:14px;">Paste Group 2 data</p>
+        <textarea rows="50" cols="20" id="group2data" placeholder="This area is not editable. Paste your Group 2 data values here from your spreadsheet." readonly></textarea>
+      </div>
+      <div class="data-col results">
+        <div class="results-card">
+          <span class="interp-title" style="font-family:'Fraunces',serif;font-weight:600;font-size:20px;color:var(--ink);">Interpretation</span>
+          <div id="interpretation" style="font-family:'Spline Sans',sans-serif;font-size:15px;color:var(--ink-soft);background:var(--neutral);border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-top:10px;">Since both the Variance (max.) and Variance (min.) surround 0. Then there is no statistical significance between the two groups.</div>
+
+          <div class="slider-container" style="margin-top:26px;">
+            <input type="range" id="cliffSlider" class="slider" min="-1" max="1" step="0.01" value="0" disabled>
+            <div class="marker"></div>
+            <div class="left-marker"></div>
+            <div class="right-marker"></div>
+            <div class="label label-left">-1</div>
+            <div class="label label-center"></div>
+            <div class="label label-right">+1</div>
+            <div id="valueLabel" class="value-label" onclick="cellClicked('cliffsDelta')">d: 0</div>
+            <div id="variancePlusSlider" class="value-label" onclick="cellClicked('+')">+</div>
+            <div id="varianceMinusSlider" class="value-label" onclick="cellClicked('-')">-</div>
+          </div>
+
+          <table style="width:100%; border-collapse:collapse; margin-top:14px;">
+            <tr>
+              <td style="text-align:center; padding:14px; font-size:14px; color:var(--ink-soft); line-height:1.55;">
+                <div id="group1lightbulb" class="redBulbOff"></div>
+                <br />
+                <strong style="color:var(--ink);">Statistical significance for <div id="group1SliderName" style="display:inline;">Group 1</div>.</strong> <br />
+                Both the "+ve" and "-ve" variances are below 0.
+              </td>
+              <td style="text-align:center; padding:14px; font-size:14px; color:var(--ink-soft); line-height:1.55;">
+                <div id="group2lightbulb" class="blueBulbOff"></div>
+                <br />
+                <strong style="color:var(--ink);">Statistical significance for <div id="group2SliderName" style="display:inline;">Group 2</div>.</strong> <br />
+                Both the "+ve" and "-ve" variances are above 0.
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div id="tooltip" class="tooltip"></div>
 
-    
+  </div>
 
+
+    <script>
+        var CLIFF_CITATIONS = {
+            apa:
+                "El-Attar, M., Shuhaiber, A., Grati, R., & Kohail, S. (2026). " +
+                "CliffInsight: An educational web application that visualizes the " +
+                "calculation of effect-sizes using Cliff's delta. In Proceedings of " +
+                "the 18th International Conference on Computer Supported Education " +
+                "(Vol. 2, pp. 1806-1815). SciTePress. " +
+                "https://doi.org/10.5220/0015020500004021",
+            ieee:
+                "M. El-Attar, A. Shuhaiber, R. Grati, and S. Kohail, " +
+                "\"CliffInsight: An educational web application that visualizes the " +
+                "calculation of effect-sizes using Cliff's delta,\" in Proc. 18th " +
+                "Int. Conf. Computer Supported Education (CSEDU), vol. 2, " +
+                "SciTePress, 2026, pp. 1806-1815, doi: 10.5220/0015020500004021.",
+            acm:
+                "Mohamed El-Attar, Ahmed Shuhaiber, Rima Grati, and Sara Kohail. " +
+                "2026. CliffInsight: An Educational Web Application That Visualizes " +
+                "the Calculation of Effect-Sizes Using Cliff's Delta. In Proceedings " +
+                "of the 18th International Conference on Computer Supported Education " +
+                "- Volume 2 (CSEDU 2026). SciTePress, 1806-1815. " +
+                "https://doi.org/10.5220/0015020500004021",
+            bibtex:
+                "@inproceedings{ElAttar2026CliffInsight,\n" +
+                "  author    = {El-Attar, Mohamed and Shuhaiber, Ahmed and Grati, Rima and Kohail, Sara},\n" +
+                "  title     = {CliffInsight: An Educational Web Application That Visualizes the Calculation of Effect-Sizes Using Cliff's Delta},\n" +
+                "  booktitle = {Proceedings of the 18th International Conference on Computer Supported Education - Volume 2},\n" +
+                "  year      = {2026},\n" +
+                "  pages     = {1806--1815},\n" +
+                "  publisher = {SciTePress},\n" +
+                "  isbn      = {978-989-758-833-4},\n" +
+                "  issn      = {2184-5026},\n" +
+                "  doi       = {10.5220/0015020500004021}\n" +
+                "}"
+        };
+
+        function showCitation(style) {
+            var textEl = document.getElementById("citationText");
+            if (textEl && CLIFF_CITATIONS[style]) {
+                textEl.textContent = CLIFF_CITATIONS[style];
+            }
+            var tabs = document.getElementsByClassName("cite-tab");
+            for (var i = 0; i < tabs.length; i++) {
+                if (tabs[i].getAttribute("data-style") === style) {
+                    tabs[i].classList.add("active");
+                } else {
+                    tabs[i].classList.remove("active");
+                }
+            }
+            var btn = document.getElementById("citationCopyBtn");
+            if (btn) {
+                btn.classList.remove("copied");
+                btn.textContent = "Copy citation";
+            }
+        }
+
+        function copyCitation() {
+            var textEl = document.getElementById("citationText");
+            var btn = document.getElementById("citationCopyBtn");
+            if (!textEl) { return; }
+            var text = textEl.textContent;
+
+            function markCopied() {
+                if (!btn) { return; }
+                btn.classList.add("copied");
+                btn.textContent = "Copied";
+                setTimeout(function () {
+                    btn.classList.remove("copied");
+                    btn.textContent = "Copy citation";
+                }, 2000);
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(markCopied, function () {
+                    fallbackCopy(text, markCopied);
+                });
+            } else {
+                fallbackCopy(text, markCopied);
+            }
+        }
+
+        function fallbackCopy(text, onDone) {
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); } catch (e) { /* no-op */ }
+            document.body.removeChild(ta);
+            if (onDone) { onDone(); }
+        }
+
+        // initialise with the default (APA) citation
+        showCitation("apa");
+    </script>
 
 </body>
-</html >
-
-
-
-
+</html>
