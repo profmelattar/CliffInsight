@@ -651,27 +651,6 @@
             line-height: 1.55;
             color: var(--ink-soft);
         }
-        .ci-counter {
-            text-align: center;
-            font-family: 'Spline Sans Mono', monospace;
-            font-size: 11px;
-            letter-spacing: .16em;
-            text-transform: uppercase;
-            color: var(--ink-soft);
-        }
-        .ci-counter .ci-digits { display: inline-flex; gap: 3px; margin-left: 10px; vertical-align: middle; }
-        .ci-counter .ci-digits span {
-            display: inline-block;
-            min-width: 22px;
-            padding: 4px 0;
-            text-align: center;
-            background: var(--ink);
-            color: var(--gold);
-            border-radius: 4px;
-            font-size: 15px;
-            font-weight: 500;
-            letter-spacing: 0;
-        }
         @media (max-width: 600px) {
             .ci-fb { padding: 20px 16px; }
             .ci-fb .ci-row { grid-template-columns: 1fr; gap: 0; }
@@ -1380,10 +1359,6 @@
       </p>
     </section>
 
-    <div class="ci-counter" aria-live="polite">
-      Visitors<span class="ci-digits" id="ci-digits"><span>&middot;</span><span>&middot;</span><span>&middot;</span><span>&middot;</span><span>&middot;</span><span>&middot;</span></span>
-    </div>
-
   </div>
 
 
@@ -1448,6 +1423,8 @@
             var btn = document.getElementById("citationCopyBtn");
             if (!textEl) { return; }
             var text = textEl.textContent;
+            var activeTab = document.querySelector(".cite-tab.active");
+            if (window.ciTrack) { window.ciTrack(activeTab ? activeTab.getAttribute("data-style") : "unknown"); }
 
             function markCopied() {
                 if (!btn) { return; }
@@ -1489,7 +1466,7 @@
     /* ---------- Feedback + visit counter ---------- */
 (function () {
   // ▼▼▼ Paste your Apps Script Web app URL here (ends in /exec) ▼▼▼
-    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwcwf2bT4SrDRA1KH-gkuc5HI0LroKMwdPEi3oHddjeZtB88Sf3mFJZcE-XNu5t3V5S/exec';
+  var ENDPOINT = 'PASTE_YOUR_WEB_APP_URL_HERE';
   // ▲▲▲
 
   var ACADEMIC = /univ|college|institut|school|academ|polytech|educat|research|hochschule|universit|école|ecole|\bedu\b|nren|janet|geant|internet2|aarnet|canarie|surf\b|renater|dfn\b|rediris/i;
@@ -1536,35 +1513,36 @@
     }).then(function (r) { return r.json(); });
   }
 
-  // --- Visit counter ---
-  function showCount(n) {
-    var s = String(n).padStart(6, '0');
-    document.getElementById('ci-digits').innerHTML =
-      s.split('').map(function (c) { return '<span>' + c + '</span>'; }).join('');
-  }
-
   var orgPromise = lookupOrg();
 
-  if (configured) {
-    if (!ssGet('ci-counted')) {
-      // first page load in this browser session: count it
-      orgPromise.then(function (o) {
-        return post({
-          type: 'visit',
-          institution: o.institution, country: o.country, academic: o.academic,
-          page: location.pathname, referrer: document.referrer ? new URL(document.referrer).hostname : ''
-        });
-      }).then(function (res) {
-        if (res && res.ok) { ssSet('ci-counted', '1'); showCount(res.count); }
-      }).catch(function () {});
-    } else {
-      // refresh within the same session: just show the number
-      fetch(ENDPOINT + '?action=count')
-        .then(function (r) { return r.json(); })
-        .then(function (res) { if (res.ok) showCount(res.count); })
-        .catch(function () {});
-    }
+  // --- Visit logging (silent: the total is only visible in your Google Sheet) ---
+  if (configured && !ssGet('ci-counted')) {
+    // first page load in this browser session: record it
+    orgPromise.then(function (o) {
+      return post({
+        type: 'visit',
+        institution: o.institution, country: o.country, academic: o.academic,
+        page: location.pathname, referrer: document.referrer ? new URL(document.referrer).hostname : ''
+      });
+    }).then(function (res) {
+      if (res && res.ok) { ssSet('ci-counted', '1'); }
+    }).catch(function () {});
   }
+
+  // --- Citation-copy tracking (called by copyCitation) ---
+  window.ciTrack = function (style) {
+    if (!configured) return;
+    var key = 'ci-cite-' + style;
+    if (ssGet(key)) return;   // count each style once per browser session
+    ssSet(key, '1');
+    orgPromise.then(function (o) {
+      return post({
+        type: 'citation', style: style,
+        institution: o.institution, country: o.country, academic: o.academic,
+        page: location.pathname
+      });
+    }).catch(function () {});
+  };
 
   // --- Star rating ---
   var rating = '';
