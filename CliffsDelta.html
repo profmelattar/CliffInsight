@@ -548,6 +548,135 @@
         .cite-copy:active { transform: translateY(1px); }
         .cite-copy.copied { background: var(--green, #6f8f5f); border-color: var(--green, #6f8f5f); }
 
+
+        /* ---------- Feedback + visit counter ---------- */
+        .ci-fb {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-top: 3px solid var(--accent-2);
+            border-radius: 0 0 14px 14px;
+            box-shadow: var(--shadow);
+            padding: 24px 28px 26px;
+            margin: 34px 0 22px;
+        }
+        .ci-fb::before {
+            content: "Feedback";
+            display: inline-block;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 11px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            background: var(--accent-2);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+        /* neutralise the page-wide p and textarea styles inside the form */
+        .ci-fb p {
+            background: none; border: none; border-radius: 0; box-shadow: none;
+            padding: 0; margin: 0; display: block;
+        }
+        .ci-fb h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 22px;
+            margin: 0 0 4px;
+            color: var(--ink);
+        }
+        .ci-fb .ci-lede { margin: 0 0 18px; font-size: 14px; color: var(--ink-soft); }
+        .ci-fb .ci-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .ci-fb label.ci-lbl {
+            display: block;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 11px;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            margin: 0 0 6px;
+        }
+        .ci-fb .ci-opt { text-transform: none; letter-spacing: 0; opacity: .8; }
+        .ci-fb input[type=text], .ci-fb input[type=email], .ci-fb textarea {
+            width: 100%;
+            min-height: 0;
+            padding: 10px 12px;
+            margin: 0 0 14px;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 14.5px;
+            line-height: 1.5;
+            color: var(--ink);
+        }
+        .ci-fb textarea { min-height: 120px; resize: vertical; }
+        .ci-fb input:focus, .ci-fb textarea:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+        .ci-fb .ci-stars { display: flex; gap: 6px; margin: 0 0 16px; }
+        .ci-fb .ci-stars button {
+            width: 38px; height: 36px;
+            background: var(--neutral);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--line);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        .ci-fb .ci-stars button:hover { color: var(--gold); }
+        .ci-fb .ci-stars button.on { background: var(--ink); border-color: var(--ink); color: var(--gold); }
+        .ci-fb .ci-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+        .ci-fb .ci-submit {
+            background: var(--accent-2);
+            border: 1px solid var(--accent-2);
+            border-radius: 9px;
+            color: #fff;
+            font-family: 'Spline Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 11px 22px;
+            cursor: pointer;
+            transition: background-color .15s ease, transform .12s ease;
+        }
+        .ci-fb .ci-submit:hover { background: var(--accent); border-color: var(--accent); }
+        .ci-fb .ci-submit:disabled { opacity: .55; cursor: default; }
+        .ci-fb .ci-status { min-height: 1.4em; margin-top: 10px; font-size: 14px; }
+        .ci-fb .ci-status.ok { color: #4f7a43; }
+        .ci-fb .ci-status.err { color: var(--accent); }
+        .ci-fb .ci-privacy {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line);
+            font-size: 12.5px;
+            line-height: 1.55;
+            color: var(--ink-soft);
+        }
+        .ci-counter {
+            text-align: center;
+            font-family: 'Spline Sans Mono', monospace;
+            font-size: 11px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+        }
+        .ci-counter .ci-digits { display: inline-flex; gap: 3px; margin-left: 10px; vertical-align: middle; }
+        .ci-counter .ci-digits span {
+            display: inline-block;
+            min-width: 22px;
+            padding: 4px 0;
+            text-align: center;
+            background: var(--ink);
+            color: var(--gold);
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+        @media (max-width: 600px) {
+            .ci-fb { padding: 20px 16px; }
+            .ci-fb .ci-row { grid-template-columns: 1fr; gap: 0; }
+        }
+
     </style>
 
     <script>
@@ -1205,6 +1334,56 @@
       </tr>
     </table>
 
+
+    <section class="ci-fb" id="feedback" aria-labelledby="ci-fb-title">
+      <h2 id="ci-fb-title">Share your feedback</h2>
+      <p class="ci-lede">Used CliffInsight in a class, a thesis, or your own analysis? Tell us what worked and what didn't. Name and email are optional.</p>
+
+      <form id="ci-fb-form" novalidate>
+        <div class="ci-row">
+          <div>
+            <label class="ci-lbl" for="ci-name">Name <span class="ci-opt">(optional)</span></label>
+            <input type="text" id="ci-name" maxlength="200" autocomplete="name">
+          </div>
+          <div>
+            <label class="ci-lbl" for="ci-email">Email <span class="ci-opt">(optional, if you'd like a reply)</span></label>
+            <input type="email" id="ci-email" maxlength="200" autocomplete="email">
+          </div>
+        </div>
+
+        <label class="ci-lbl">How useful was it? <span class="ci-opt">(optional)</span></label>
+        <div class="ci-stars" id="ci-stars" role="radiogroup" aria-label="Rating out of 5">
+          <button type="button" data-v="1" aria-label="1 star">&#9733;</button>
+          <button type="button" data-v="2" aria-label="2 stars">&#9733;</button>
+          <button type="button" data-v="3" aria-label="3 stars">&#9733;</button>
+          <button type="button" data-v="4" aria-label="4 stars">&#9733;</button>
+          <button type="button" data-v="5" aria-label="5 stars">&#9733;</button>
+        </div>
+
+        <label class="ci-lbl" for="ci-msg">Your feedback</label>
+        <textarea id="ci-msg" maxlength="3000" required></textarea>
+
+        <!-- honeypot: hidden from people, bots fill it in -->
+        <div class="ci-hp" aria-hidden="true">
+          <label for="ci-website">Website</label>
+          <input type="text" id="ci-website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="submit" class="ci-submit" id="ci-submit">Send feedback</button>
+        <p class="ci-status" id="ci-status" role="status" aria-live="polite"></p>
+      </form>
+
+      <p class="ci-privacy">
+        Privacy: to understand which universities use this tool, your network's organisation name and
+        country are looked up when the page loads. Your IP address is never stored or sent to us, only
+        the organisation name (for example, a university) and country.
+      </p>
+    </section>
+
+    <div class="ci-counter" aria-live="polite">
+      Visitors<span class="ci-digits" id="ci-digits"><span>&middot;</span><span>&middot;</span><span>&middot;</span><span>&middot;</span><span>&middot;</span><span>&middot;</span></span>
+    </div>
+
   </div>
 
 
@@ -1304,6 +1483,138 @@
         // initialise with the default (APA) citation
         showCitation("apa");
     </script>
+
+
+    <script>
+    /* ---------- Feedback + visit counter ---------- */
+(function () {
+  // ▼▼▼ Paste your Apps Script Web app URL here (ends in /exec) ▼▼▼
+    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwcwf2bT4SrDRA1KH-gkuc5HI0LroKMwdPEi3oHddjeZtB88Sf3mFJZcE-XNu5t3V5S/exec';
+  // ▲▲▲
+
+  var ACADEMIC = /univ|college|institut|school|academ|polytech|educat|research|hochschule|universit|école|ecole|\bedu\b|nren|janet|geant|internet2|aarnet|canarie|surf\b|renater|dfn\b|rediris/i;
+  var configured = ENDPOINT.indexOf('http') === 0;
+
+  function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function ssSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+
+  // --- Organisation lookup: only org name + country are kept; the IP itself is discarded ---
+  function lookupOrg() {
+    var cached = ssGet('ci-org');
+    if (cached) { try { return Promise.resolve(JSON.parse(cached)); } catch (e) {} }
+
+    function tidy(org) { return String(org || '').replace(/^AS\d+\s+/i, '').trim(); }
+
+    return fetch('https://ipapi.co/json/')
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (d) {
+        if (d.error) throw 0;
+        return { institution: tidy(d.org), country: d.country_name || '' };
+      })
+      .catch(function () {
+        // fallback provider
+        return fetch('https://ipwho.is/?fields=country,connection')
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            return { institution: tidy(d.connection && (d.connection.org || d.connection.isp)), country: d.country || '' };
+          });
+      })
+      .catch(function () { return { institution: '', country: '' }; })
+      .then(function (o) {
+        o.academic = ACADEMIC.test(o.institution);
+        ssSet('ci-org', JSON.stringify(o));
+        return o;
+      });
+  }
+
+  function post(payload) {
+    // text/plain avoids a CORS preflight, which Apps Script does not answer
+    return fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json(); });
+  }
+
+  // --- Visit counter ---
+  function showCount(n) {
+    var s = String(n).padStart(6, '0');
+    document.getElementById('ci-digits').innerHTML =
+      s.split('').map(function (c) { return '<span>' + c + '</span>'; }).join('');
+  }
+
+  var orgPromise = lookupOrg();
+
+  if (configured) {
+    if (!ssGet('ci-counted')) {
+      // first page load in this browser session: count it
+      orgPromise.then(function (o) {
+        return post({
+          type: 'visit',
+          institution: o.institution, country: o.country, academic: o.academic,
+          page: location.pathname, referrer: document.referrer ? new URL(document.referrer).hostname : ''
+        });
+      }).then(function (res) {
+        if (res && res.ok) { ssSet('ci-counted', '1'); showCount(res.count); }
+      }).catch(function () {});
+    } else {
+      // refresh within the same session: just show the number
+      fetch(ENDPOINT + '?action=count')
+        .then(function (r) { return r.json(); })
+        .then(function (res) { if (res.ok) showCount(res.count); })
+        .catch(function () {});
+    }
+  }
+
+  // --- Star rating ---
+  var rating = '';
+  var stars = document.querySelectorAll('#ci-stars button');
+  stars.forEach(function (b) {
+    b.addEventListener('click', function () {
+      rating = (rating === b.dataset.v) ? '' : b.dataset.v;  // click again to clear
+      stars.forEach(function (s) { s.classList.toggle('on', rating && Number(s.dataset.v) <= Number(rating)); });
+    });
+  });
+
+  // --- Feedback form ---
+  var form = document.getElementById('ci-fb-form');
+  var status = document.getElementById('ci-status');
+  var btn = document.getElementById('ci-submit');
+
+  function setStatus(msg, cls) { status.textContent = msg; status.className = 'ci-status ' + (cls || ''); }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var msg = document.getElementById('ci-msg').value.trim();
+    var email = document.getElementById('ci-email').value.trim();
+
+    if (!msg) { setStatus('Please write a short message before sending.', 'err'); return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setStatus('That email address doesn\'t look right. You can also leave it blank.', 'err'); return; }
+    if (!configured) { setStatus('Feedback isn\'t connected yet (endpoint URL missing).', 'err'); return; }
+
+    btn.disabled = true; setStatus('Sending…');
+
+    orgPromise.then(function (o) {
+      return post({
+        type: 'feedback',
+        name: document.getElementById('ci-name').value.trim(),
+        email: email,
+        rating: rating,
+        message: msg,
+        website: document.getElementById('ci-website').value,
+        institution: o.institution, country: o.country,
+        page: location.pathname
+      });
+    }).then(function (res) {
+      if (!res || !res.ok) throw 0;
+      form.reset(); rating = ''; stars.forEach(function (s) { s.classList.remove('on'); });
+      setStatus('Thank you! Your feedback has been received.', 'ok');
+    }).catch(function () {
+      setStatus('Sorry, something went wrong. Please try again in a moment.', 'err');
+    }).then(function () { btn.disabled = false; });
+  });
+})();
+</script>
 
 </body>
 </html>
